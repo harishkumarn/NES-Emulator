@@ -1,5 +1,6 @@
 package com.nes8.components;
 
+import com.nes8.components.software.Opcodes;
 import com.nes8.graphics.ObjectAttributeMemory;
 import java.util.Stack;
 
@@ -36,7 +37,7 @@ public class CPU {
     DMA dma = new DMA();
     ObjectAttributeMemory oam = new ObjectAttributeMemory();
     public Stack<Integer> stack = new Stack<Integer>();
-    
+    Opcodes opc = new Opcodes(this);
 
 
     public CPU(Bus bus){
@@ -50,9 +51,11 @@ public class CPU {
 
     public void interpret() throws InterruptedException{
         
-        byte inst = bus.getByteCode(programCounter);
-
-
+        while(programCounter <= this.bus.byteCodeLastAddress){
+            byte inst = bus.getByteCode(programCounter);
+            byte cycles = opc.getOpcode(inst).execute();
+            cycle(cycles);
+        }
     }
 
     public void updateFlag(Flag flag, boolean yes){

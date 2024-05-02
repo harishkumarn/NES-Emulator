@@ -16,6 +16,10 @@ public class Opcodes {
         initOpcodes();
     }
 
+    public Opcode getOpcode(byte inst){
+        return opcodes.get(inst);
+    }
+
     private void updateADCFlags(byte a, byte o, byte c){
         cpu.updateFlag(Flag.C, (a + o + c) > 255);
         cpu.updateFlag(Flag.Z, ((a + o + c) & 0xFF) == 0);

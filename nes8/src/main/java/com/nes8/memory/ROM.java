@@ -16,6 +16,7 @@ public class ROM {
     byte[] pgr_ROM , chr_ROM ;
     NameTableArrangeMent nTableArrangeMent;
     BufferedInputStream br = null;
+    public short byteCodeLastAddress = 0 ;
     public ROM(String romPath)  throws IOException{
         initStream(romPath);
     }
