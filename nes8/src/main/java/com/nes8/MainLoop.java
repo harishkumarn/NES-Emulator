@@ -16,7 +16,17 @@ public class MainLoop
         Bus bus = new Bus(rom);
         CPU cpu = new CPU(bus);
         PPU ppu = new PPU(bus);
-        cpu.interpret();// 1.79 Mhz
-        ppu.start();// 5.32 Mhz
+        new Thread( () -> {
+                try{
+                    cpu.interpret();// 1.79 Mhz
+                }catch(Exception e){}
+        }).start();
+
+        new Thread( () -> {
+                try{
+                    ppu.start();// 5.32 Mhz
+                }catch(Exception e){}
+        }).start();
+        
     }
 }

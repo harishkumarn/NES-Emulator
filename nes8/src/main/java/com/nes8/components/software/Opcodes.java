@@ -712,6 +712,8 @@ public class Opcodes {
                 return (byte)cycle;
             }
         });
+
+        //-----------------------------------
     }
 
 }

@@ -12,4 +12,9 @@ public class PPU {
     public void start(){
         
     }
+
+    private void cycle(byte cycles) throws InterruptedException{
+        // 5.32 MHz is roughly  188 nano sec per cycle
+        Thread.sleep(0,cycles *  188);
+    }
 }
