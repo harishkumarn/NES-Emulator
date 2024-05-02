@@ -3,10 +3,10 @@ import com.nes8.memory.*;
 public class Bus {
     ROM rom ;
     RAM ram = new RAM();
-    short byteCodeLastAddress;
+    int pgr_rom_size;
     public Bus(ROM rom){
         this.rom = rom;
-        this.byteCodeLastAddress = rom.byteCodeLastAddress;
+        this.pgr_rom_size = rom.pgr_rom_size;
     }
 
     /**

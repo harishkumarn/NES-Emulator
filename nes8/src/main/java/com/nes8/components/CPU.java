@@ -14,6 +14,8 @@ public class CPU {
     public byte indexY = 0;
     public byte accumulator = 0 ;
 
+    private short byteCodeLastAddress ;
+
     public enum Flag{
         C(1<<7),
         Z(1<<6),
@@ -42,6 +44,8 @@ public class CPU {
 
     public CPU(Bus bus){
         this.bus = bus;
+        this.byteCodeLastAddress = (short) (this.programCounter + this.bus.pgr_rom_size);
+
     }
 
     private void cycle(byte cycles) throws InterruptedException{
@@ -49,9 +53,10 @@ public class CPU {
         Thread.sleep(0,cycles *  558);
     }
 
+
     public void interpret() throws InterruptedException{
         
-        while(programCounter <= this.bus.byteCodeLastAddress){
+        while(programCounter <= this.byteCodeLastAddress){
             byte inst = bus.getByteCode(programCounter);
             byte cycles = isa.getOpcode(inst).execute();
             cycle(cycles);

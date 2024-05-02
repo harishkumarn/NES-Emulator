@@ -16,7 +16,8 @@ public class ROM {
     byte[] pgr_ROM , chr_ROM ;
     NameTableArrangeMent nTableArrangeMent;
     BufferedInputStream br = null;
-    public short byteCodeLastAddress = 0 ;
+    public int pgr_rom_size = 0;
+    public int chr_rom_size =0;
     public ROM(String romPath)  throws IOException{
         initStream(romPath);
     }
@@ -30,8 +31,6 @@ public class ROM {
         try{
             byte[] header = new byte[16];
             br.read(header);
-            int pgr_rom_size = 0;
-            int chr_rom_size =0;
             int fileType = (header[7] & 12) == 8 ? 2 : 1;
             nTableArrangeMent = (header[6] & 1 ) == 0  ? NameTableArrangeMent.VERTICAL : NameTableArrangeMent.HORIZONTAL;
             boolean alternativeNameTables = (header[6] & 8 ) == 1;
