@@ -1,6 +1,6 @@
 package com.nes8.components;
 
-import com.nes8.components.software.Opcodes;
+import com.nes8.components.software.ISA;
 import com.nes8.graphics.ObjectAttributeMemory;
 import java.util.Stack;
 
@@ -37,7 +37,7 @@ public class CPU {
     DMA dma = new DMA();
     ObjectAttributeMemory oam = new ObjectAttributeMemory();
     public Stack<Integer> stack = new Stack<Integer>();
-    Opcodes opc = new Opcodes(this);
+    ISA isa = new ISA(this);
 
 
     public CPU(Bus bus){
@@ -53,7 +53,7 @@ public class CPU {
         
         while(programCounter <= this.bus.byteCodeLastAddress){
             byte inst = bus.getByteCode(programCounter);
-            byte cycles = opc.getOpcode(inst).execute();
+            byte cycles = isa.getOpcode(inst).execute();
             cycle(cycles);
         }
     }

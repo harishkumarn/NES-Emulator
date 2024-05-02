@@ -6,12 +6,12 @@ import com.nes8.components.CPU;
 import com.nes8.components.CPU.Flag;
 
 // It can disassemble byte code as well
-public class Opcodes {
+public class ISA {
     HashMap<Integer, Opcode> opcodes  = new HashMap<Integer, Opcode>();
 
     final CPU cpu ;
 
-    public Opcodes(CPU cpu){
+    public ISA(CPU cpu){
         this.cpu = cpu;
         initOpcodes();
     }
