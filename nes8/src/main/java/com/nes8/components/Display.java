@@ -5,15 +5,13 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Display extends JPanel{
-    private Color[] palette = null;
     private int w, h, scale;
-    byte[][] pixels ;
-    public Display(int w, int h, int scale,byte[][] pixels, Color[] palette, String name){
+    Color[][] pixels ;
+    public Display(int w, int h, int scale,Color[][] pixels, String name){
         this.w = w;
         this.h = h;
         this.scale = scale;
         this.pixels = pixels;
-        this.palette = palette;
         setPreferredSize(new Dimension(w * scale, w * scale));
 
         SwingUtilities.invokeLater(() -> {
@@ -35,7 +33,7 @@ public class Display extends JPanel{
         super.paintComponent(g);
         for (int x = 0; x < w; x++) {
             for (int y = 0; y < h; y++) {
-                g.setColor(palette[pixels[x][y]]);
+                g.setColor(pixels[x][y]);
                 g.fillRect(x * scale, y * scale, scale, scale);
             }
         }
