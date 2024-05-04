@@ -1,5 +1,7 @@
 package com.nes8.components;
 
+import java.awt.Color;
+
 public class PPU {
     Bus bus;
     private static int PT_WIDTH = 16*8;
@@ -23,9 +25,9 @@ public class PPU {
 
     private void initPatternTables(){
         renderPatternTable(0x0000, pt1);
-        new Display(PT_WIDTH, PT_HEIGHT, PT_SCALE, pt1, "PT-1");
+        new Display(PT_WIDTH, PT_HEIGHT, PT_SCALE, pt1, new Color[]{Color.PINK, Color.BLUE, Color.GREEN, Color.RED},  "PT-1");
         renderPatternTable(0x1000, pt2);
-        new Display(PT_WIDTH, PT_HEIGHT, PT_SCALE, pt2, "PT-2");
+        new Display(PT_WIDTH, PT_HEIGHT, PT_SCALE, pt2,  new Color[]{Color.PINK, Color.BLUE, Color.GREEN, Color.RED}, "PT-2");
     }
 
     private void cycle(byte cycles) throws InterruptedException{
