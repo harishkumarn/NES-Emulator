@@ -11,7 +11,7 @@ import com.nes8.components.PPU;
 public class MainLoop 
 {
     public static void main(String[] args) throws IOException, InterruptedException{
-        ROM rom = new ROM("/Users/harish-8433/Downloads/64-in-1 (J) [p1].nes");
+        ROM rom = new ROM("/Users/harish-8433/Downloads/yun.nes");
         rom.initROM();
         Bus bus = new Bus(rom);
         CPU cpu = new CPU(bus);

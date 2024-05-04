@@ -13,7 +13,7 @@ public class ROM {
         VERTICAL // 64x30 -> Games with horizontal scroll
     }
 
-    byte[] pgr_ROM , chr_ROM ;
+    public byte[] pgr_ROM , chr_ROM ;
     NameTableArrangeMent nTableArrangeMent;
     BufferedInputStream br = null;
     public int pgr_rom_size = 0;
@@ -39,21 +39,25 @@ public class ROM {
             }
             int mapper = 0, hintScreenData = 0 ;
             if(fileType == 1){
-                System.out.println("iNES File Format " + 1);
+               
                 pgr_rom_size = header[4] & 0xFF;
                 chr_rom_size = header[5]  & 0xFF;
                 mapper = (header[7] & 0xF0 ) | ((header[6] & 0xF0) >> 4 ) ;
                 hintScreenData = (header[7] & 2) == 2 ? 8192 : 0 ;
             }else{// bytes 8-15 in NES 2 format
-                System.out.println("iNES File Format " + 2);
                 pgr_rom_size = ((header[9] & 0xF) << 8) |  (header[4] & 0xFF);
                 chr_rom_size = ((header[9] & 0xF0) << 4) |  (header[5]  & 0xFF);
                 mapper = ((header[6] & 0xF) << 8 ) | (header[7] & 0xF0 ) | ((header[6] & 0xF0) >> 4 ) ;
             }
-            pgr_ROM = new byte[pgr_rom_size * 16384];
-            chr_ROM = new byte[chr_rom_size * 8192 + hintScreenData];
-            br.read(pgr_ROM);
-            br.read(chr_ROM);
+            System.out.println("iNES File Format " + fileType);
+            pgr_rom_size *= 16384;
+            chr_rom_size = chr_rom_size * 8192 + hintScreenData;
+            System.out.println("Program size  : " +  pgr_rom_size + " Bytes\n\n");
+            System.out.println("Chr size  : " + chr_rom_size + " Bytes\n\n");
+            pgr_ROM = new byte[pgr_rom_size ];
+            chr_ROM = new byte[chr_rom_size ];
+            System.out.println("Pgr ROM bytes read : " +  br.read(pgr_ROM));
+            System.out.println("Chr ROM bytes read : " +  br.read(chr_ROM));
             setMapper(mapper);
         }catch(Exception e){
             System.err.println(e);

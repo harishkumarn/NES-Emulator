@@ -7,14 +7,14 @@ import java.util.Stack;
 
 public class CPU {
     // Registers
-    public short programCounter = 0;
+    public int programCounter =  0x8000;
     public byte stackPointer = 0 ; 
     public byte statusRegister = 0;
     public byte indexX = 0;
     public byte indexY = 0;
     public byte accumulator = 0 ;
 
-    private short byteCodeLastAddress ;
+    private int byteCodeLastAddress ;
 
     public enum Flag{
         C(1<<7),
@@ -44,7 +44,7 @@ public class CPU {
 
     public CPU(Bus bus){
         this.bus = bus;
-        this.byteCodeLastAddress = (short) (this.programCounter + this.bus.pgr_rom_size);
+        this.byteCodeLastAddress = this.programCounter + this.bus.pgr_rom_size;
 
     }
 
@@ -55,9 +55,9 @@ public class CPU {
 
 
     public void interpret() throws InterruptedException{
-        
         while(programCounter <= this.byteCodeLastAddress){
             byte inst = bus.getByteCode(programCounter);
+            System.out.print(Integer.toHexString(programCounter) + "    ");
             byte cycles = isa.getOpcode(inst).execute();
             cycle(cycles);
         }

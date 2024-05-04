@@ -15,7 +15,10 @@ public class Bus {
      * @return
      */
     public byte getByteCode(int address){
-        return 0;
+        if(address >= 0x8000 && address <= 0xBFFF){
+            return rom.pgr_ROM[address - 0x8000 ];
+        }
+        return (byte)0;
     }
 
     /**
