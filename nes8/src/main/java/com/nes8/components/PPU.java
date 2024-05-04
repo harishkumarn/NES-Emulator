@@ -1,12 +1,16 @@
 package com.nes8.components;
 
-
-
 public class PPU {
     Bus bus;
     private static int PT_WIDTH = 16*8;
     private static int PT_HEIGHT = 16*8;
     private static int PT_SCALE = 2;
+
+    private static int DISPLAY_SCALE = 5;
+    private static int DISPLAY_WIDTH = 32*8;
+    private static int DISPLAY_HEIGHT = 30*8;
+
+    private byte[][] display = new byte[DISPLAY_WIDTH][DISPLAY_HEIGHT];
     private byte[][] pt1  = new byte[PT_WIDTH][PT_HEIGHT];
     private byte[][] pt2  = new byte[PT_WIDTH][PT_HEIGHT];
     public PPU(Bus bus){
