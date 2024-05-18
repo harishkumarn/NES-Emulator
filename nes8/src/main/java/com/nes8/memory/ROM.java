@@ -39,7 +39,6 @@ public class ROM {
             }
             int mapper = 0, hintScreenData = 0 ;
             if(fileType == 1){
-               
                 pgr_rom_size = header[4] & 0xFF;
                 chr_rom_size = header[5]  & 0xFF;
                 mapper = (header[7] & 0xF0 ) | ((header[6] & 0xF0) >> 4 ) ;
@@ -49,7 +48,7 @@ public class ROM {
                 chr_rom_size = ((header[9] & 0xF0) << 4) |  (header[5]  & 0xFF);
                 mapper = ((header[6] & 0xF) << 8 ) | (header[7] & 0xF0 ) | ((header[6] & 0xF0) >> 4 ) ;
             }
-            System.out.println("iNES File Format " + fileType + "\n\n");
+            System.out.println("iNES File Format : " + fileType + "\n\n");
             pgr_rom_size *= 16384;
             chr_rom_size = chr_rom_size * 8192 + hintScreenData;
             System.out.println("Pgr ROM size  : " +  pgr_rom_size + " Bytes");
@@ -68,7 +67,7 @@ public class ROM {
     }
 
     void setMapper(int mapper){
-        System.out.println("Mapper id " +  mapper);
+        System.out.println("\n\nMapper id " +  mapper);
         switch(mapper){
             case 0:
             break;

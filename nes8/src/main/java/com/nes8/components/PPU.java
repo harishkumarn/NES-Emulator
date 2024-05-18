@@ -21,6 +21,7 @@ public class PPU {
 
     public void start(){
         initPatternTables();
+        initNameTable();
     }
 
     private void initPatternTables(){
@@ -30,17 +31,30 @@ public class PPU {
         new Display(PT_WIDTH, PT_HEIGHT, PT_SCALE, pt2, "PT-2");
     }
 
-    private void cycle(byte cycles) throws InterruptedException{
+    private void initNameTable(){
+
+    }
+
+    private void cycle(int cycles) throws InterruptedException{
         // 5.32 MHz is roughly  188 nano sec per cycle
         Thread.sleep(0,cycles *  188);
     }
 
+    private void hBlank() throws InterruptedException{
+        cycle(341);
+    }
+
+    private void vBlank() throws InterruptedException{
+        cycle(21 * 341);
+    }
+
     private void renderPatternTable(int address, Color[][] pt){
-        Color[] palette = new Color[]{Color.PINK, Color.BLUE, Color.GREEN, Color.RED};
-        byte[] lowByte = new byte[16], highByte = new byte[16];
+        Color[] palette = new Color[]{Color.BLACK, Color.WHITE, Color.BLUE, Color.GRAY};
+        byte[] lowByte = new byte[8], highByte = new byte[8];
         int x,y, c;
-        for(int i = 0 ; i < 128; i+= 8  ){
-            for(int j = 0 ; j < 128;j+=8){
+       
+        for(int j = 0 ; j < 128;j+=8){
+            for(int i = 0 ; i < 128; i+= 8  ){
                 for(int k = 0; k < 8;++k) lowByte[k] = bus.rom.chr_ROM[address++];//plane 1
                 for(int k = 0; k < 8;++k) highByte[k] = bus.rom.chr_ROM[address++];//plane 2
                 for(int k = 0; k < 8;++k){

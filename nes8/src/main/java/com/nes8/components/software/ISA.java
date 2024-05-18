@@ -44,6 +44,11 @@ public class ISA {
         cpu.updateFlag(Flag.N, val < 0 );
     }
 
+    private void updateDEC_INC_Flags(byte val){
+        cpu.updateFlag(Flag.Z, val == 0);
+        cpu.updateFlag(Flag.N, val < 0 );
+    }
+
     private void initOpcodes(){
         // ADC
         opcodes.put(0x69, new Opcode((byte)2){
@@ -53,7 +58,7 @@ public class ISA {
                 int temp = cpu.accumulator + operand  + cpu.getFlag(Flag.C);
                 updateADCFlags(cpu.accumulator, operand , cpu.getFlag(Flag.C));
                 cpu.accumulator = (byte)(temp & 0xFF);
-                System.out.println("ADC #"+ Integer.toHexString(operand));
+                printASM("ADC #"+ Integer.toHexString(operand));
                 return (byte)cycle;
             }
         });
@@ -65,7 +70,7 @@ public class ISA {
                 int temp = cpu.accumulator + cpu.bus.cpuRead(operand) +  cpu.getFlag(Flag.C);
                 updateADCFlags(cpu.accumulator,cpu.bus.cpuRead(operand), cpu.getFlag(Flag.C));
                 cpu.accumulator = (byte)(temp & 0xFF);
-                System.out.println("ADC "+ Integer.toHexString(operand));
+                printASM("ADC "+ Integer.toHexString(operand));
                 return (byte)cycle;
             }
         });
@@ -76,7 +81,7 @@ public class ISA {
                 int temp = cpu.accumulator + cpu.bus.cpuRead(operand + cpu.indexX) +  cpu.getFlag(Flag.C);
                 updateADCFlags(cpu.accumulator, cpu.bus.cpuRead(operand + cpu.indexX), cpu.getFlag(Flag.C));
                 cpu.accumulator = (byte)(temp & 0xFF);
-                System.out.println("ADC "+ Integer.toHexString(operand) + " ,X");
+                printASM("ADC "+ Integer.toHexString(operand) + " ,X");
                 return (byte)cycle;
             }
         });
@@ -88,7 +93,7 @@ public class ISA {
                 int temp = cpu.accumulator + cpu.bus.cpuRead( (operand2 << 8 ) + operand1) +  cpu.getFlag(Flag.C);
                 updateADCFlags(cpu.accumulator,cpu.bus.cpuRead( (operand2 << 8 ) + operand1) , cpu.getFlag(Flag.C));
                 cpu.accumulator = (byte)(temp & 0xFF);
-                System.out.println("ADC "+ Integer.toHexString((operand2 << 8 ) + operand1) );
+                printASM("ADC "+ Integer.toHexString((operand2 << 8 ) + operand1) );
                 return (byte)cycle;
             }
         });
@@ -100,7 +105,7 @@ public class ISA {
                 int temp = cpu.accumulator + cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexX) +  cpu.getFlag(Flag.C);
                 updateADCFlags(cpu.accumulator, cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexX), cpu.getFlag(Flag.C));
                 cpu.accumulator = (byte)(temp & 0xFF);
-                System.out.println("ADC "+ Integer.toHexString((operand1 << 8 ) + operand2) + " ,X" );
+                printASM("ADC "+ Integer.toHexString((operand1 << 8 ) + operand2) + " ,X" );
                 return (byte)cycle;
             }
         });
@@ -112,7 +117,7 @@ public class ISA {
                 int temp = cpu.accumulator + cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexY) +  cpu.getFlag(Flag.C);
                 updateADCFlags(cpu.accumulator,cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexY)  , cpu.getFlag(Flag.C));
                 cpu.accumulator = (byte)(temp & 0xFF);
-                System.out.println("ADC "+ Integer.toHexString((operand1 << 8 ) + operand2) + " ,Y" );
+                printASM("ADC "+ Integer.toHexString((operand1 << 8 ) + operand2) + " ,Y" );
                 return (byte)cycle;
             }
         });
@@ -124,7 +129,7 @@ public class ISA {
                 int temp = cpu.accumulator + cpu.bus.cpuRead(address ) +  cpu.getFlag(Flag.C);
                 updateADCFlags(cpu.accumulator, cpu.bus.cpuRead(address ), cpu.getFlag(Flag.C));
                 cpu.accumulator = (byte)(temp & 0xFF);
-                System.out.println("ADC ("+ Integer.toHexString(operand) + " ,X)" );
+                printASM("ADC ("+ Integer.toHexString(operand) + " ,X)" );
                 return (byte)cycle;
             }
         });
@@ -136,7 +141,7 @@ public class ISA {
                 int temp = cpu.accumulator + cpu.bus.cpuRead(address ) +  cpu.getFlag(Flag.C);
                 updateADCFlags(cpu.accumulator,cpu.bus.cpuRead(address ) , cpu.getFlag(Flag.C));
                 cpu.accumulator = (byte)(temp & 0xFF);
-                System.out.println("ADC ("+ Integer.toHexString(operand) + ") ,Y" );
+                printASM("ADC ("+ Integer.toHexString(operand) + ") ,Y" );
                 return (byte)cycle;
             }
         });
@@ -151,7 +156,7 @@ public class ISA {
                 int temp = cpu.accumulator & operand ;
                 updateANDFlags(temp);
                 cpu.accumulator = (byte)(temp & 0xFF);
-                System.out.println("AND #"+ Integer.toHexString(operand));
+                printASM("AND #"+ Integer.toHexString(operand));
                 return (byte)cycle;
             }
         });
@@ -163,7 +168,7 @@ public class ISA {
                 int temp = cpu.accumulator & cpu.bus.cpuRead(operand);
                 updateANDFlags(temp);
                 cpu.accumulator = (byte)(temp & 0xFF);
-                System.out.println("AND "+ Integer.toHexString(operand));
+                printASM("AND "+ Integer.toHexString(operand));
                 return (byte)cycle;
             }
         });
@@ -174,7 +179,7 @@ public class ISA {
                 int temp = cpu.accumulator & cpu.bus.cpuRead(operand + cpu.indexX);
                 updateANDFlags(temp);
                 cpu.accumulator = (byte)(temp & 0xFF);
-                System.out.println("AND "+ Integer.toHexString(operand) + " ,X");
+                printASM("AND "+ Integer.toHexString(operand) + " ,X");
                 return (byte)cycle;
             }
         });
@@ -186,7 +191,7 @@ public class ISA {
                 int temp = cpu.accumulator & cpu.bus.cpuRead( (operand1 << 8 ) + operand2) ;
                 updateANDFlags(temp);
                 cpu.accumulator = (byte)(temp & 0xFF);
-                System.out.println("AND "+ Integer.toHexString((operand1 << 8 ) + operand2) );
+                printASM("AND "+ Integer.toHexString((operand1 << 8 ) + operand2) );
                 return (byte)cycle;
             }
         });
@@ -198,7 +203,7 @@ public class ISA {
                 int temp = cpu.accumulator & cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexX) ;
                 updateANDFlags(temp);
                 cpu.accumulator = (byte)(temp & 0xFF);
-                System.out.println("AND "+ Integer.toHexString((operand1 << 8 ) + operand2) + " ,X" );
+                printASM("AND "+ Integer.toHexString((operand1 << 8 ) + operand2) + " ,X" );
                 return (byte)cycle;
             }
         });
@@ -210,7 +215,7 @@ public class ISA {
                 int temp = cpu.accumulator & cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexY) ;
                 updateANDFlags(temp);
                 cpu.accumulator = (byte)(temp & 0xFF);
-                System.out.println("AND "+ Integer.toHexString((operand1 << 8 ) + operand2) + " ,Y" );
+                printASM("AND "+ Integer.toHexString((operand1 << 8 ) + operand2) + " ,Y" );
                 return (byte)cycle;
             }
         });
@@ -222,7 +227,7 @@ public class ISA {
                 int temp = cpu.accumulator & cpu.bus.cpuRead(address ) ;
                 updateANDFlags(temp);
                 cpu.accumulator = (byte)(temp & 0xFF);
-                System.out.println("AND ("+ Integer.toHexString(operand) + " ,X)" );
+                printASM("AND ("+ Integer.toHexString(operand) + " ,X)" );
                 return (byte)cycle;
             }
         });
@@ -234,7 +239,7 @@ public class ISA {
                 int temp = cpu.accumulator & cpu.bus.cpuRead(address ) ;
                 updateANDFlags(temp);
                 cpu.accumulator = (byte)(temp & 0xFF);
-                System.out.println("AND ("+ Integer.toHexString(operand) + ") ,Y" );
+                printASM("AND ("+ Integer.toHexString(operand) + ") ,Y" );
                 return (byte)cycle;
             }
         });
@@ -249,7 +254,7 @@ public class ISA {
                 int temp = cpu.accumulator << 1;
                 updateASLFlags(temp);
                 cpu.accumulator = (byte)(temp & 0xFF);
-                System.out.println("ASL A");
+                printASM("ASL A");
                 return (byte)cycle;
             }
         });
@@ -261,7 +266,7 @@ public class ISA {
                 int temp = cpu.bus.cpuRead(operand) << 1;
                 updateASLFlags(temp);
                 cpu.bus.cpuWrite(operand, (byte)(temp & 0xFF));
-                System.out.println("ASL "+ Integer.toHexString(operand));
+                printASM("ASL "+ Integer.toHexString(operand));
                 return (byte)cycle;
             }
         });
@@ -272,7 +277,7 @@ public class ISA {
                 int temp = cpu.bus.cpuRead(operand + cpu.indexX) << 1;
                 updateASLFlags(temp);
                 cpu.bus.cpuWrite(operand + cpu.indexX, (byte)(temp & 0xFF));
-                System.out.println("ASL "+ Integer.toHexString(operand) + " ,X");
+                printASM("ASL "+ Integer.toHexString(operand) + " ,X");
                 return (byte)cycle;
             }
         });
@@ -284,7 +289,7 @@ public class ISA {
                 int temp =  cpu.bus.cpuRead( (operand1 << 8 ) + operand2) << 1;
                 updateASLFlags(temp);
                 cpu.bus.cpuWrite((operand1 << 8 ) + operand2, (byte)(temp & 0xFF));
-                System.out.println("ASL "+ Integer.toHexString((operand1 << 8 ) + operand2) );
+                printASM("ASL "+ Integer.toHexString((operand1 << 8 ) + operand2) );
                 return (byte)cycle;
             }
         });
@@ -296,7 +301,7 @@ public class ISA {
                 int temp = cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexX) << 1;
                 updateASLFlags(temp);
                 cpu.bus.cpuWrite((operand1 << 8 ) + operand2 + cpu.indexX, (byte)(temp & 0xFF));
-                System.out.println("ASL "+ Integer.toHexString((operand1 << 8 ) + operand2) + " ,X" );
+                printASM("ASL "+ Integer.toHexString((operand1 << 8 ) + operand2) + " ,X" );
                 return (byte)cycle;
             }
         });
@@ -311,7 +316,7 @@ public class ISA {
                 if(cpu.getFlag(Flag.C) == 0 ){
                     cpu.programCounter = operand;
                 }
-                System.out.println("BCC "+ Integer.toHexString(operand) );
+                printASM("BCC "+ Integer.toHexString(operand) );
                 return (byte)cycle;
             }
         });
@@ -325,7 +330,7 @@ public class ISA {
                 if(cpu.getFlag(Flag.C) == 1 ){
                     cpu.programCounter = operand;
                 }
-                System.out.println("BCS "+ Integer.toHexString(operand) );
+                printASM("BCS "+ Integer.toHexString(operand) );
                 return (byte)cycle;
             }
         });
@@ -339,7 +344,7 @@ public class ISA {
                 if(cpu.getFlag(Flag.Z) == 1 ){
                     cpu.programCounter = operand;
                 }
-                System.out.println("BEQ "+ Integer.toHexString(operand) );
+                printASM("BEQ "+ Integer.toHexString(operand) );
                 return (byte)cycle;
             }
         });
@@ -354,7 +359,7 @@ public class ISA {
                 if(cpu.getFlag(Flag.N) == 1 ){
                     cpu.programCounter = operand;
                 }
-                System.out.println("BMI "+ Integer.toHexString(operand) );
+                printASM("BMI "+ Integer.toHexString(operand) );
                 return (byte)cycle;
             }
         });
@@ -368,7 +373,7 @@ public class ISA {
                 if(cpu.getFlag(Flag.Z) == 0 ){
                     cpu.programCounter = operand;
                 }
-                System.out.println("BNE "+ Integer.toHexString(operand) );
+                printASM("BNE "+ Integer.toHexString(operand) );
                 return (byte)cycle;
             }
         });
@@ -382,7 +387,7 @@ public class ISA {
                 if(cpu.getFlag(Flag.N) == 0 ){
                     cpu.programCounter = operand;
                 }
-                System.out.println("BPL "+ Integer.toHexString(operand) );
+                printASM("BPL "+ Integer.toHexString(operand) );
                 return (byte)cycle;
             }
         });
@@ -396,7 +401,7 @@ public class ISA {
                 if(cpu.getFlag(Flag.V) == 0 ){
                     cpu.programCounter = operand;
                 }
-                System.out.println("BVC "+ Integer.toHexString(operand) );
+                printASM("BVC "+ Integer.toHexString(operand) );
                 return (byte)cycle;
             }
         });
@@ -410,7 +415,7 @@ public class ISA {
                 if(cpu.getFlag(Flag.V) == 1 ){
                     cpu.programCounter = operand;
                 }
-                System.out.println("BVS "+ Integer.toHexString(operand) );
+                printASM("BVS "+ Integer.toHexString(operand) );
                 return (byte)cycle;
             }
         });
@@ -421,7 +426,7 @@ public class ISA {
             @Override
             public byte execute(){
                 cpu.updateFlag(Flag.C, false);
-                System.out.println("CLC" );
+                printASM("CLC" );
                 return (byte)cycle;
             }
         });
@@ -432,7 +437,7 @@ public class ISA {
             @Override
             public byte execute(){
                 cpu.updateFlag(Flag.D, false);
-                System.out.println("CLD" );
+                printASM("CLD" );
                 return (byte)cycle;
             }
         });
@@ -443,7 +448,7 @@ public class ISA {
             @Override
             public byte execute(){
                 cpu.updateFlag(Flag.I, false);
-                System.out.println("CLI" );
+                printASM("CLI" );
                 return (byte)cycle;
             }
         });
@@ -454,7 +459,7 @@ public class ISA {
             @Override
             public byte execute(){
                 cpu.updateFlag(Flag.V, false);
-                System.out.println("CLV" );
+                printASM("CLV" );
                 return (byte)cycle;
             }
         });
@@ -468,7 +473,7 @@ public class ISA {
                 cpu.updateFlag(Flag.Z, (val & 0xFF) == 0);
                 cpu.updateFlag(Flag.N, (val & 0x80) > 0);
                 cpu.indexX = (byte)(val & 0xFF);
-                System.out.println("INX" );
+                printASM("INX" );
                 return (byte)cycle;
             }
         });
@@ -484,7 +489,7 @@ public class ISA {
                 cpu.updateFlag(Flag.Z, (val & 0xFF) == 0);
                 cpu.updateFlag(Flag.N, (val & 0x80) > 0);
                 cpu.indexY = (byte)(val & 0xFF);
-                System.out.println("INY" );
+                printASM("INY" );
                 return (byte)cycle;
             }
         });
@@ -504,7 +509,7 @@ public class ISA {
                 cpu.updateFlag(Flag.I, false);// ?? is this needed
 
                 cpu.programCounter = (short)((cpu.bus.cpuRead(0xFFFF) << 8 ) | (cpu.bus.cpuRead(0xFFFE)));
-                System.out.println("BRK" );
+                printASM("BRK" );
                 return (byte)cycle;
             }
         });
@@ -519,7 +524,7 @@ public class ISA {
                 cpu.updateFlag(Flag.N, ( m & 0x80) > 0 );
                 cpu.updateFlag(Flag.V, ( m & 0x40) > 0);
                 cpu.updateFlag(Flag.Z, ( (cpu.accumulator & m ) & 0xFF )  == 0);
-                System.out.println("BIT " + Integer.toHexString(operand) );
+                printASM("BIT " + Integer.toHexString(operand) );
                 return (byte)cycle;
             }
         });
@@ -533,7 +538,7 @@ public class ISA {
                 cpu.updateFlag(Flag.N, ( m & 0x80) > 0 );
                 cpu.updateFlag(Flag.V, ( m & 0x40) > 0);
                 cpu.updateFlag(Flag.Z, ( (cpu.accumulator & m ) & 0xFF )  == 0);
-                System.out.println("BIT " + Integer.toHexString((operand2 << 8) + operand1) );
+                printASM("BIT " + Integer.toHexString((operand2 << 8) + operand1) );
                 return (byte)cycle;
             }
         });
@@ -547,7 +552,7 @@ public class ISA {
                 byte operand = cpu.bus.getByteCode(cpu.programCounter++);
                 int temp = cpu.accumulator - operand ;
                 updateCMPFlags(temp);
-                System.out.println("CMP #"+ Integer.toHexString(operand));
+                printASM("CMP #"+ Integer.toHexString(operand));
                 return (byte)cycle;
             }
         });
@@ -558,7 +563,7 @@ public class ISA {
                 byte operand = cpu.bus.getByteCode(cpu.programCounter++);
                 int temp = cpu.accumulator - cpu.bus.cpuRead(operand) ;
                 updateCMPFlags(temp);
-                System.out.println("CMP "+ Integer.toHexString(operand));
+                printASM("CMP "+ Integer.toHexString(operand));
                 return (byte)cycle;
             }
         });
@@ -568,7 +573,7 @@ public class ISA {
                 byte operand = cpu.bus.getByteCode(cpu.programCounter++);
                 int temp = cpu.accumulator - cpu.bus.cpuRead(operand + cpu.indexX) ;
                 updateCMPFlags(temp);
-                System.out.println("CMP "+ Integer.toHexString(operand) + " ,X");
+                printASM("CMP "+ Integer.toHexString(operand) + " ,X");
                 return (byte)cycle;
             }
         });
@@ -579,7 +584,7 @@ public class ISA {
                 byte operand2 = cpu.bus.getByteCode(cpu.programCounter++);
                 int temp = cpu.accumulator - cpu.bus.cpuRead( (operand2 << 8 ) + operand1) ;
                 updateCMPFlags(temp);
-                System.out.println("CMP "+ Integer.toHexString((operand2 << 8 ) + operand1) );
+                printASM("CMP "+ Integer.toHexString((operand2 << 8 ) + operand1) );
                 return (byte)cycle;
             }
         });
@@ -590,7 +595,7 @@ public class ISA {
                 byte operand1 = cpu.bus.getByteCode(cpu.programCounter++);
                 int temp = cpu.accumulator - cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexX) ;
                 updateCMPFlags(temp);
-                System.out.println("CMP "+ Integer.toHexString((operand1 << 8 ) + operand2) + " ,X" );
+                printASM("CMP "+ Integer.toHexString((operand1 << 8 ) + operand2) + " ,X" );
                 return (byte)cycle;
             }
         });
@@ -601,7 +606,7 @@ public class ISA {
                 byte operand1 = cpu.bus.getByteCode(cpu.programCounter++);
                 int temp = cpu.accumulator - cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexY) ;
                 updateCMPFlags(temp);
-                System.out.println("CMP "+ Integer.toHexString((operand1 << 8 ) + operand2) + " ,Y" );
+                printASM("CMP "+ Integer.toHexString((operand1 << 8 ) + operand2) + " ,Y" );
                 return (byte)cycle;
             }
         });
@@ -612,7 +617,7 @@ public class ISA {
                 int address = (cpu.bus.cpuRead(operand + 1) << 8 )  + cpu.bus.cpuRead(operand );
                 int temp = cpu.accumulator - cpu.bus.cpuRead(address );
                 updateCMPFlags(temp);
-                System.out.println("CMP ("+ Integer.toHexString(operand) + " ,X)" );
+                printASM("CMP ("+ Integer.toHexString(operand) + " ,X)" );
                 return (byte)cycle;
             }
         });
@@ -623,7 +628,7 @@ public class ISA {
                 int address = (cpu.bus.cpuRead(operand + 1) << 8 )  + cpu.bus.cpuRead(operand ) +  cpu.indexY;
                 int temp = cpu.accumulator - cpu.bus.cpuRead(address );
                 updateCMPFlags(temp);
-                System.out.println("CMP ("+ Integer.toHexString(operand) + ") ,Y" );
+                printASM("CMP ("+ Integer.toHexString(operand) + ") ,Y" );
                 return (byte)cycle;
             }
         });
@@ -636,7 +641,7 @@ public class ISA {
                 byte operand = cpu.bus.getByteCode(cpu.programCounter++);
                 int temp = cpu.indexX - operand ;
                 updateCMPFlags(temp);
-                System.out.println("CPX #"+ Integer.toHexString(operand));
+                printASM("CPX #"+ Integer.toHexString(operand));
                 return (byte)cycle;
             }
         });
@@ -648,7 +653,7 @@ public class ISA {
                 byte operand = cpu.bus.getByteCode(cpu.programCounter++);
                 int temp = cpu.indexX - cpu.bus.cpuRead(operand) ;
                 updateCMPFlags(temp);
-                System.out.println("CPX "+ Integer.toHexString(operand));
+                printASM("CPX "+ Integer.toHexString(operand));
                 return (byte)cycle;
             }
         });
@@ -660,7 +665,7 @@ public class ISA {
                 byte operand2 = cpu.bus.getByteCode(cpu.programCounter++);
                 int temp = cpu.indexX - cpu.bus.cpuRead( (operand2 << 8 ) + operand1) ;
                 updateCMPFlags(temp);
-                System.out.println("CPX "+ Integer.toHexString((operand2 << 8 ) + operand1) );
+                printASM("CPX "+ Integer.toHexString((operand2 << 8 ) + operand1) );
                 return (byte)cycle;
             }
         });
@@ -674,7 +679,7 @@ public class ISA {
                 byte operand = cpu.bus.getByteCode(cpu.programCounter++);
                 int temp = cpu.indexY - operand ;
                 updateCMPFlags(temp);
-                System.out.println("CPY #"+ Integer.toHexString(operand));
+                printASM("CPY #"+ Integer.toHexString(operand));
                 return (byte)cycle;
             }
         });
@@ -686,7 +691,7 @@ public class ISA {
                 byte operand = cpu.bus.getByteCode(cpu.programCounter++);
                 int temp = cpu.indexY - cpu.bus.cpuRead(operand) ;
                 updateCMPFlags(temp);
-                System.out.println("CPY "+ Integer.toHexString(operand));
+                printASM("CPY "+ Integer.toHexString(operand));
                 return (byte)cycle;
             }
         });
@@ -698,7 +703,7 @@ public class ISA {
                 byte operand2 = cpu.bus.getByteCode(cpu.programCounter++);
                 int temp = cpu.indexY - cpu.bus.cpuRead( (operand2 << 8 ) + operand1) ;
                 updateCMPFlags(temp);
-                System.out.println("CPY "+ Integer.toHexString((operand2 << 8 ) + operand1) );
+                printASM("CPY "+ Integer.toHexString((operand2 << 8 ) + operand1) );
                 return (byte)cycle;
             }
         });
@@ -708,12 +713,168 @@ public class ISA {
         opcodes.put(0xEA,new Opcode((byte)2){
             @Override
             public byte execute(){
-                System.out.println("NOP");
+                printASM("NOP");
                 return (byte)cycle;
             }
         });
 
         //-----------------------------------
+        //DEC
+
+        opcodes.put(0xC6,new Opcode((byte)5){
+            @Override
+            public byte execute(){
+                byte operand1 = cpu.bus.getByteCode(cpu.programCounter++);
+                byte val = (byte) (cpu.bus.cpuRead( operand1) - 1);
+                updateDEC_INC_Flags( val  );
+                cpu.bus.cpuWrite(operand1, val);
+                printASM("DEC " + Integer.toHexString(operand1));
+                return (byte)cycle;
+            }
+        });
+
+        opcodes.put(0xD6,new Opcode((byte)6){
+            @Override
+            public byte execute(){
+                byte operand1 = cpu.bus.getByteCode(cpu.programCounter++);
+                byte val = (byte) (cpu.bus.cpuRead( operand1 + cpu.indexX) - 1); 
+                updateDEC_INC_Flags( val  );
+                cpu.bus.cpuWrite(  operand1 + cpu.indexX, val);
+                printASM("DEC " +  Integer.toHexString(operand1) + " ,X");
+                return (byte)cycle;
+            }
+        });
+
+        opcodes.put(0xCE,new Opcode((byte)6){
+            @Override
+            public byte execute(){
+                byte operand2 = cpu.bus.getByteCode(cpu.programCounter++);
+                byte operand1 = cpu.bus.getByteCode(cpu.programCounter++);
+                byte val = (byte) (cpu.bus.cpuRead( (operand1 << 8 ) + operand2 ) - 1);
+                updateDEC_INC_Flags( val  );
+                cpu.bus.cpuWrite( (operand1 << 8 ) + operand2 , val);
+                printASM("DEC " +  Integer.toHexString((operand1 << 8 ) + operand2));
+                return (byte)cycle;
+            }
+        });
+
+        opcodes.put(0xDE,new Opcode((byte)7){
+            @Override
+            public byte execute(){
+                byte operand2 = cpu.bus.getByteCode(cpu.programCounter++);
+                byte operand1 = cpu.bus.getByteCode(cpu.programCounter++);
+                byte val = (byte) (cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexX) - 1) ;
+                updateDEC_INC_Flags( val  );
+                cpu.bus.cpuWrite( (operand1 << 8 ) + operand2 + cpu.indexX, val);
+                printASM("DEC " +  Integer.toHexString((operand1 << 8 ) + operand2) + ", X");
+                return (byte)cycle;
+            }
+        });
+
+        //-----------------------------------
+        //DEX
+
+        opcodes.put(0xCA,new Opcode((byte)2){
+            @Override
+            public byte execute(){
+                updateDEC_INC_Flags( --cpu.indexX  );
+                printASM("DEX");
+                return (byte)cycle;
+            }
+        });
+
+        //-----------------------------------
+        //DEY
+
+        opcodes.put(0x88,new Opcode((byte)2){
+            @Override
+            public byte execute(){
+                updateDEC_INC_Flags( --cpu.indexY  );
+                printASM("DEY");
+                return (byte)cycle;
+            }
+        });
+
+         //-----------------------------------
+        //INX
+
+        opcodes.put(0xE8,new Opcode((byte)2){
+            @Override
+            public byte execute(){
+                updateDEC_INC_Flags( ++cpu.indexX  );
+                printASM("INX");
+                return (byte)cycle;
+            }
+        });
+
+        //-----------------------------------
+        //INY
+
+        opcodes.put(0xC8,new Opcode((byte)2){
+            @Override
+            public byte execute(){
+                updateDEC_INC_Flags( ++cpu.indexY  );
+                printASM("INY");
+                return (byte)cycle;
+            }
+        });
+
+        //-----------------------------------
+        //INC
+
+        opcodes.put(0xE6,new Opcode((byte)5){
+            @Override
+            public byte execute(){
+                byte operand1 = cpu.bus.getByteCode(cpu.programCounter++);
+                byte val = (byte) (cpu.bus.cpuRead( operand1) + 1);
+                updateDEC_INC_Flags( val  );
+                cpu.bus.cpuWrite(operand1, val);
+                printASM("INC " + Integer.toHexString(operand1));
+                return (byte)cycle;
+            }
+        });
+
+        opcodes.put(0xF6,new Opcode((byte)6){
+            @Override
+            public byte execute(){
+                byte operand1 = cpu.bus.getByteCode(cpu.programCounter++);
+                byte val = (byte) (cpu.bus.cpuRead( operand1 + cpu.indexX) + 1); 
+                updateDEC_INC_Flags( val  );
+                cpu.bus.cpuWrite(  operand1 + cpu.indexX, val);
+                printASM("INC " +  Integer.toHexString(operand1) + " ,X");
+                return (byte)cycle;
+            }
+        });
+
+        opcodes.put(0xEE,new Opcode((byte)6){
+            @Override
+            public byte execute(){
+                byte operand2 = cpu.bus.getByteCode(cpu.programCounter++);
+                byte operand1 = cpu.bus.getByteCode(cpu.programCounter++);
+                byte val = (byte) (cpu.bus.cpuRead( (operand1 << 8 ) + operand2 ) + 1);
+                updateDEC_INC_Flags( val  );
+                cpu.bus.cpuWrite( (operand1 << 8 ) + operand2 , val);
+                printASM("INC " +  Integer.toHexString((operand1 << 8 ) + operand2));
+                return (byte)cycle;
+            }
+        });
+
+        opcodes.put(0xFE,new Opcode((byte)7){
+            @Override
+            public byte execute(){
+                byte operand2 = cpu.bus.getByteCode(cpu.programCounter++);
+                byte operand1 = cpu.bus.getByteCode(cpu.programCounter++);
+                byte val = (byte) (cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexX) + 1) ;
+                updateDEC_INC_Flags( val  );
+                cpu.bus.cpuWrite( (operand1 << 8 ) + operand2 + cpu.indexX, val);
+                printASM("INC " +  Integer.toHexString((operand1 << 8 ) + operand2) + ", X");
+                return (byte)cycle;
+            }
+        });
+
+        //EOR, JMP, JSR, LDA, LDX, LDY, LSR, ORA, PHA, PHP, PLA, PLP, ROL, ROR, RTI, RTS, SBC, SEC, SED, SEI, STA, STX, STY, 
+        //TAX, TAY, TSX, TXA, TXS, TYA
+
     }
 
 }

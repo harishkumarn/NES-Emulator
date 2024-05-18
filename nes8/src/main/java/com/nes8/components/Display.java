@@ -6,6 +6,7 @@ import java.awt.*;
 
 public class Display extends JPanel{
     private int w, h, scale;
+    private Color[] palette = null;
     Color[][] pixels ;
     public Display(int w, int h, int scale,Color[][] pixels, String name){
         this.w = w;
@@ -26,6 +27,10 @@ public class Display extends JPanel{
 
     public void rerender(){
         repaint();
+    }
+
+    public void updatePalette(Color[] palette){
+        this.palette = palette;
     }
 
     @Override

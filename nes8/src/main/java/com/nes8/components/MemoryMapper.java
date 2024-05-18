@@ -1,5 +1,6 @@
 package com.nes8.components;
 
-public class MemoryMapper {
+public interface MemoryMapper {
+
     
-}
+} 
