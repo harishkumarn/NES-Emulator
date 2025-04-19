@@ -35,17 +35,17 @@ public class Pallete {
         new Color(0, 252, 252),   new Color(248, 216, 248), new Color(0, 0, 0),       new Color(0, 0, 0)
     };
 
-    private byte[][] background = new byte[4][4];
+    private byte[][] backGround = new byte[4][4];
     private byte[][] foreGround = new byte[4][4];
 
-    public void updatePalette(int address, byte color){
+    public void updatePalette(int address, byte index){
         // TODO: handle mirrored pallete addresses
         if(address >= 0x3F00 && address <= 0x3F0F){
             int relative = address - 0x3F00;
-            background[relative / 4][relative % 4 ] = color; 
+            backGround[relative / 4][relative % 4 ] = index; 
         }else{
             int relative  = address - 0X3F10;
-            foreGround[relative / 4][relative % 4] = color;
+            foreGround[relative / 4][relative % 4] = index;
         }
     }
 }

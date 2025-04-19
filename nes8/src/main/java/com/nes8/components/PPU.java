@@ -16,6 +16,9 @@ public class PPU {
     Pallete pallete;
     GameUI gui ;
 
+    //8 PPU registers memory mapped from 0x2000 to 0x2007
+    byte[] registers = new byte[8];
+
     public PPU(Bus bus){
         this.bus = bus;
         this.pt1 = new PatternTable(bus);
@@ -39,6 +42,10 @@ public class PPU {
 
     private void initNameTable(){
 
+    }
+
+    public void write(int address, byte data){
+        registers[address - 0x2000] = data;
     }
 
     private void cycle(int cycles) throws InterruptedException{
