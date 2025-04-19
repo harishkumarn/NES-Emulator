@@ -10,4 +10,8 @@ public class Settings {
     public static final int DISPLAY_SCALE = 5; 
 
     public static ControllerInterface.Type CONTROLLER_TYPE = ControllerInterface.Type.Controller;
+
+    public static boolean RENDER_PATTERN_TABLE = true;
+
+    public static float GAME_SPEED = 1f;
 }

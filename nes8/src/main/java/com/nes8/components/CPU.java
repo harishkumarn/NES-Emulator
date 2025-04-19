@@ -1,5 +1,6 @@
 package com.nes8.components;
 
+import com.nes8.Settings;
 import com.nes8.components.software.ISA;
 import com.nes8.graphics.ObjectAttributeMemory;
 import java.util.Stack;
@@ -7,6 +8,7 @@ import java.util.Stack;
 
 /**
  * This is an attempt to emulate the 6502, I'm pretty sure this is ridden with errors in many instructions :p
+ * Memory range : 0x0000 to 0xFFFF
  */
 
 public class CPU {
@@ -54,7 +56,7 @@ public class CPU {
 
     private void cycle(byte cycles) throws InterruptedException{
         // 1.79 MHz is roughly  558 nano sec per cycle
-        Thread.sleep(0,cycles *  558);
+        Thread.sleep(0,(int)(cycles *  558 * Settings.GAME_SPEED));
     }
 
 
