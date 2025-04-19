@@ -23,14 +23,14 @@ public class CPU {
     private int byteCodeLastAddress ;
 
     public enum Flag{
-        C(1<<7),
-        Z(1<<6),
-        I(1<<5),
-        D(1<<4),
-        B(1<<3),
-        U(1<<2),
-        V(1<<1),
-        N(1);
+        C(1<<7), // Carry Flag
+        Z(1<<6), // Zero flag
+        I(1<<5), // IRQ disable flag
+        D(1<<4), // BCD Flag ( Not used in NES)
+        B(1<<3), // Break flag
+        U(1<<2), // Unused
+        V(1<<1), // Unsigned overflow
+        N(1); // Negative
         int index;
         Flag(int index){
             this.index = index;
