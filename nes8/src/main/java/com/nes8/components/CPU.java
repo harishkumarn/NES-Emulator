@@ -5,6 +5,10 @@ import com.nes8.graphics.ObjectAttributeMemory;
 import java.util.Stack;
 
 
+/**
+ * This is an attempt to emulate the 6502, I'm pretty sure this is ridden with errors in many instructions :p
+ */
+
 public class CPU {
     // Registers
     public int programCounter =  0x8000;
