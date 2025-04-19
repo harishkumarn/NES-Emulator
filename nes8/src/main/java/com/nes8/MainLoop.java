@@ -12,7 +12,7 @@ import com.nes8.components.Controller;
 public class MainLoop 
 {
     public static void main(String[] args) throws IOException, InterruptedException{
-        ROM rom = new ROM(EnvConstants.ROM_PATH);
+        ROM rom = new ROM(Settings.ROM_PATH);
         if(!rom.initROM()) return;
         Bus bus = new Bus(rom);
         CPU cpu = new CPU(bus);

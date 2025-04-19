@@ -1,7 +1,7 @@
 package com.nes8.components;
 import com.nes8.memory.*;
 public class Bus {
-    ROM rom ;
+    public ROM rom ;
     RAM ram = new RAM();
     int pgr_rom_size;
     public Bus(ROM rom){

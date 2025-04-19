@@ -1,12 +1,11 @@
 package com.nes8.components;
 
 import java.awt.Color;
-import com.nes8.graphics.Pallete;
+import com.nes8.graphics.*;
 
 public class PPU {
     Bus bus;
-    private static int PT_WIDTH = 16*8;
-    private static int PT_HEIGHT = 16*8;
+   
     private static int PT_SCALE = 2;
 
     private static int DISPLAY_SCALE = 5;
@@ -14,10 +13,13 @@ public class PPU {
     private static int DISPLAY_HEIGHT = 30*8;
 
     private Color[][] display = new Color[DISPLAY_WIDTH][DISPLAY_HEIGHT];
-    private Color[][] pt1  = new Color[PT_WIDTH][PT_HEIGHT];
-    private Color[][] pt2  = new Color[PT_WIDTH][PT_HEIGHT];
+
+    PatternTable pt1, pt2 ;
+
     public PPU(Bus bus){
         this.bus = bus;
+        this.pt1 = new PatternTable(bus);
+        this.pt2 = new PatternTable(bus);
     }
 
     public void start(){
@@ -26,10 +28,10 @@ public class PPU {
     }
 
     private void initPatternTables(){
-        renderPatternTable(0x0000, pt1);
-        new Display(PT_WIDTH, PT_HEIGHT, PT_SCALE, pt1,  "PT-1");
-        renderPatternTable(0x1000, pt2);
-        new Display(PT_WIDTH, PT_HEIGHT, PT_SCALE, pt2, "PT-2");
+        pt1.init(0x0000);
+        Display.init(PatternTable.PT_WIDTH, PatternTable.PT_HEIGHT, PT_SCALE, pt1.getPixels(),  "PT-1");
+        pt2.init(0x1000);
+        Display.init(PatternTable.PT_WIDTH, PatternTable.PT_HEIGHT, PT_SCALE, pt2.getPixels(), "PT-2");
     }
 
     private void initNameTable(){
@@ -47,27 +49,5 @@ public class PPU {
 
     private void vBlank() throws InterruptedException{
         cycle(21 * 341);
-    }
-
-    private void renderPatternTable(int address, Color[][] pt){
-        byte[] lowByte = new byte[8], highByte = new byte[8];
-        int x,y, c;
-       
-        for(int j = 0 ; j < 128;j+=8){
-            for(int i = 0 ; i < 128; i+= 8  ){
-                for(int k = 0; k < 8;++k) lowByte[k] = bus.rom.chr_ROM[address++];//plane 1
-                for(int k = 0; k < 8;++k) highByte[k] = bus.rom.chr_ROM[address++];//plane 2
-                for(int k = 0; k < 8;++k){
-                    for(int l = 7; l >= 0;--l){
-                        x = i + ( 7 - l );
-                        y = j + k ;
-                        c = 0 ;
-                        if((highByte[k] & ( 1<< l)) > 0 ) c = 2;
-                        if((lowByte[k] & ( 1<< l)) > 0) c += 1;
-                        pt[x][y] = Pallete.PATTERN_TABLE_COLORS[c];
-                    }
-                }
-            }
-        }
     }
 }

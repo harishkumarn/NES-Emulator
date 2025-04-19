@@ -8,7 +8,10 @@ public class Display extends JPanel{
     private int w, h, scale;
     private Color[] palette = null;
     Color[][] pixels ;
-    public Display(int w, int h, int scale,Color[][] pixels, String name){
+    public static void init(int w, int h, int scale, Color[][] pixels, String name){
+        new Display(w, h, scale, pixels,name);
+    }
+    private Display(int w, int h, int scale,Color[][] pixels, String name){
         this.w = w;
         this.h = h;
         this.scale = scale;
