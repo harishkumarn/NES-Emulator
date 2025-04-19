@@ -1,6 +1,7 @@
 package com.nes8.components;
 
 import java.awt.Color;
+import com.nes8.graphics.Pallete;
 
 public class PPU {
     Bus bus;
@@ -49,7 +50,6 @@ public class PPU {
     }
 
     private void renderPatternTable(int address, Color[][] pt){
-        Color[] palette = new Color[]{Color.BLACK, Color.WHITE, Color.BLUE, Color.GRAY};
         byte[] lowByte = new byte[8], highByte = new byte[8];
         int x,y, c;
        
@@ -64,7 +64,7 @@ public class PPU {
                         c = 0 ;
                         if((highByte[k] & ( 1<< l)) > 0 ) c = 2;
                         if((lowByte[k] & ( 1<< l)) > 0) c += 1;
-                        pt[x][y] = palette[c];
+                        pt[x][y] = Pallete.PATTERN_TABLE_COLORS[c];
                     }
                 }
             }
