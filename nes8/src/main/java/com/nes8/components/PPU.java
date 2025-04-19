@@ -8,8 +8,14 @@ import com.nes8.graphics.*;
 public class PPU {
     Bus bus;
 
+    // 0X0000 to 0x1FFF
     PatternTable pt1, pt2 ;
+
+    //0X2000 to 0X3EFF
     NameTable nt;
+
+    //0X3F00 to 0X3FFF
+    Pallete pallete;
     GameUI gui ;
 
     public PPU(Bus bus){
