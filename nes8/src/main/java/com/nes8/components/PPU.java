@@ -11,28 +11,8 @@ import com.nes8.graphics.*;
 public class PPU {
     Bus bus;
 
-    /**
-     * Range : 0X0000 to 0x1FFF
-     * PT1 - 0x0000 to 0x0FFF - 4KB
-     * PT2 - 0X1000 to 0x1FFF - 4KB  
-     */
     PatternTable pt1, pt2 ;
-
-    /**
-     * Range : 0x2000 to 0x3EFF
-     * NT 0 : 0x2000 to 0x23FF - 1 KB
-     * NT 1 : 0x2400 to 0x27FF - 1 KB
-     * NT 2 ( Mirror ) : 0x2800 to 0x2BFF - 1 KB
-     * NT 3 ( Mirror ) : 0x2C00 to 0x2FFF - 1 KB
-     * Mirrors of 0x2000 to 0x2EFF : 0x3000 - 0x3EFF - 1 KB
-     */
-    NameTable nt;
-
-    /**
-     * Range : 0x3F00 to 0x3FFF 
-     * 0x3F00 to 0x3F1F - 32 B
-     * Mirros of 0x3F00 to 0x3F1F : 0x3F20 to 0x3FFF 
-     */
+    NameTable nt;    
     Pallete pallete;
     GameUI gui ;
 

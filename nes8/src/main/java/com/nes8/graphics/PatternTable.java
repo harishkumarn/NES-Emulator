@@ -3,7 +3,12 @@ package com.nes8.graphics;
 import com.nes8.components.Bus;
 
 import java.awt.Color;
-
+ 
+/**
+ * Range : 0X0000 to 0x1FFF
+ * PT1 - 0x0000 to 0x0FFF - 4KB
+ * PT2 - 0X1000 to 0x1FFF - 4KB  
+ */
 public class PatternTable {
     Bus bus;
 
