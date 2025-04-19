@@ -10,7 +10,7 @@ public class PatternTable {
     public static int PT_WIDTH = 16*8;
     public static int PT_HEIGHT = 16*8;
 
-    private Color[][] pt = new Color[PT_HEIGHT][PT_WIDTH];
+    private Color[][] pt = new Color[PT_WIDTH][PT_HEIGHT];
 
     public PatternTable(Bus bus ){
         this.bus = bus;

@@ -1,25 +1,22 @@
 package com.nes8.components;
 
-import java.awt.Color;
+
+import com.nes8.Settings;
+import com.nes8.components.helper.Display;
 import com.nes8.graphics.*;
 
 public class PPU {
     Bus bus;
-   
-    private static int PT_SCALE = 2;
-
-    private static int DISPLAY_SCALE = 5;
-    private static int DISPLAY_WIDTH = 32*8;
-    private static int DISPLAY_HEIGHT = 30*8;
-
-    private Color[][] display = new Color[DISPLAY_WIDTH][DISPLAY_HEIGHT];
 
     PatternTable pt1, pt2 ;
+    NameTable nt;
+    GameUI gui ;
 
     public PPU(Bus bus){
         this.bus = bus;
         this.pt1 = new PatternTable(bus);
         this.pt2 = new PatternTable(bus);
+        this.gui = new GameUI();
     }
 
     public void start(){
@@ -29,9 +26,9 @@ public class PPU {
 
     private void initPatternTables(){
         pt1.init(0x0000);
-        Display.init(PatternTable.PT_WIDTH, PatternTable.PT_HEIGHT, PT_SCALE, pt1.getPixels(),  "PT-1");
+        Display.init(PatternTable.PT_WIDTH, PatternTable.PT_HEIGHT, Settings.PT_SCALE, pt1.getPixels(),  "PT-1");
         pt2.init(0x1000);
-        Display.init(PatternTable.PT_WIDTH, PatternTable.PT_HEIGHT, PT_SCALE, pt2.getPixels(), "PT-2");
+        Display.init(PatternTable.PT_WIDTH, PatternTable.PT_HEIGHT, Settings.PT_SCALE, pt2.getPixels(), "PT-2");
     }
 
     private void initNameTable(){
