@@ -11,8 +11,8 @@ import com.nes8.components.PPU;
 public class MainLoop 
 {
     public static void main(String[] args) throws IOException, InterruptedException{
-        ROM rom = new ROM(EnvConstants.BASE_PATH + "\\ROMS\\mario.nes");
-        rom.initROM();
+        ROM rom = new ROM(EnvConstants.ROM_PATH);
+        if(!rom.initROM()) return;
         Bus bus = new Bus(rom);
         CPU cpu = new CPU(bus);
         PPU ppu = new PPU(bus);

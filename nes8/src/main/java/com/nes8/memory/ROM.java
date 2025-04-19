@@ -26,8 +26,9 @@ public class ROM {
         br = new BufferedInputStream(new FileInputStream(new File(file)));
     } 
 
-    public void initROM() throws IOException{
+    public boolean initROM() throws IOException{
         System.out.println("\n");
+        boolean status = true;
         try{
             byte[] header = new byte[16];
             br.read(header);
@@ -57,16 +58,17 @@ public class ROM {
             chr_ROM = new byte[chr_rom_size ];
             System.out.println("Pgr ROM bytes read : " +  br.read(pgr_ROM));
             System.out.println("Chr ROM bytes read : " +  br.read(chr_ROM));
-            setMapper(mapper);
+            status = setMapper(mapper);
         }catch(Exception e){
             System.err.println(e);
         }finally{
             br.close();
         }
         System.out.println("\n");
+        return status;
     }
 
-    void setMapper(int mapper){
+    boolean setMapper(int mapper){
         System.out.println("\n\nMapper id " +  mapper);
         switch(mapper){
             case 0:
@@ -105,8 +107,9 @@ public class ROM {
             break;
             default:
                 System.out.println("Unknown mapper!!");
-            break;
+                return false;
         }
+        return true;
     }
 
 }
