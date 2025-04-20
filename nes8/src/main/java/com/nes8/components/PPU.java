@@ -50,7 +50,7 @@ public class PPU {
 
     private void cycle(int cycles) throws InterruptedException{
         // 5.32 MHz is roughly  188 nano sec per cycle
-        Thread.sleep(0,(int)(cycles *  188 * Settings.GAME_SPEED));
+        Thread.sleep(0,(int)(cycles *  188  / Settings.GAME_SPEED));
     }
 
     private void hBlank() throws InterruptedException{

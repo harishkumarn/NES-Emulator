@@ -56,7 +56,7 @@ public class CPU {
 
     private void cycle(byte cycles) throws InterruptedException{
         // 1.79 MHz is roughly  558 nano sec per cycle
-        Thread.sleep(0,(int)(cycles *  558 * Settings.GAME_SPEED));
+        Thread.sleep(0,(int)(cycles *  558 / Settings.GAME_SPEED));
     }
 
 

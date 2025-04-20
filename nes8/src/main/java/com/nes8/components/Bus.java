@@ -27,6 +27,11 @@ public class Bus {
      * @return
      */
     public byte cpuRead(int address){
+        if(address >= 0x8000 && address <= 0xBFFF){
+            return rom.pgr_ROM[address - 0x8000];
+        }else if(address >= 0x2000 && address <= 0x2007){
+            
+        }
         return ram.read(address);
     }
 
