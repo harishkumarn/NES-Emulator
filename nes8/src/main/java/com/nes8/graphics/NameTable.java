@@ -16,6 +16,6 @@ package com.nes8.graphics;
  * 
  */
 public class NameTable {
-    byte[] vram = new byte[1<<12];
+    public byte[] vram = new byte[1<<12];
 }
 

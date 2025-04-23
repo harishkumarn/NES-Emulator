@@ -1,9 +1,11 @@
-package com.nes8.components;
+package com.nes8.components.processor;
 
 import com.nes8.Settings;
 import com.nes8.components.software.ISA;
 import com.nes8.graphics.ObjectAttributeMemory;
 import java.util.Stack;
+
+import com.nes8.components.DMA;
 import com.nes8.components.bus.Bus;
 
 
@@ -12,7 +14,7 @@ import com.nes8.components.bus.Bus;
  * Memory range : 0x0000 to 0xFFFF
  */
 
-public class CPU {
+public class CPU implements Processor{
     // Registers
     public int programCounter =  0x8000;
     public byte stackPointer = 0 ; 
@@ -52,7 +54,7 @@ public class CPU {
     public CPU(Bus bus, int pgr_rom_size){
         this.bus = bus;
         this.byteCodeLastAddress = this.programCounter + pgr_rom_size;
-
+        bus.setProcessor(this);
     }
 
     private void cycle(byte cycles) throws InterruptedException{

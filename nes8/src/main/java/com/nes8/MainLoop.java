@@ -19,6 +19,7 @@ public class MainLoop
 
         PPUBus ppuBus = new PPUBus(rom);
         PPU ppu = new PPU(ppuBus);
+       
         Controller.init(cpuBus);
 
         new Thread( () -> {

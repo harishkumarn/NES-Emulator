@@ -1,10 +1,13 @@
 package com.nes8.components.bus;
 
+import com.nes8.components.processor.Processor;
+
 import com.nes8.memory.ROM;
 
 public class PPUBus implements Bus{
 
     ROM rom ;
+    Processor chip;
 
     public PPUBus(ROM rom){
         this.rom = rom;
@@ -19,7 +22,12 @@ public class PPUBus implements Bus{
     }
 
     @Override
-    public void write(int adderss, byte value){
+    public void write(int address, byte value){
 
+    }
+
+    @Override
+    public void setProcessor(Processor p){
+        this.chip = p;
     }
 }

@@ -2,11 +2,13 @@ package com.nes8.components.bus;
 
 import com.nes8.memory.RAM;
 import com.nes8.memory.ROM;
+import com.nes8.components.processor.Processor;
 
 public class CPUBus implements Bus{
 
     public ROM rom ;
     private RAM ram = new RAM();
+    private Processor chip;
     int pgr_rom_size;
 
 
@@ -28,5 +30,10 @@ public class CPUBus implements Bus{
     @Override
     public void write(int address, byte value){
         ram.write(address, value);
+    }
+
+    @Override
+    public void setProcessor(Processor p){
+        this.chip = p;
     }
 }

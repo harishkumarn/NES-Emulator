@@ -1,4 +1,4 @@
-package com.nes8.components;
+package com.nes8.components.processor;
 
 
 import com.nes8.Settings;
@@ -9,7 +9,7 @@ import com.nes8.components.bus.Bus;
 /**
  * Memory range : 0x0000 to 0x3FFF
  */
-public class PPU {
+public class PPU implements Processor{
     Bus bus;
 
     PatternTable pt1, pt2 ;
@@ -25,6 +25,7 @@ public class PPU {
         this.pt1 = new PatternTable(bus);
         this.pt2 = new PatternTable(bus);
         this.gui = new OutputBuffer();
+        bus.setProcessor(this);
     }
 
     public void start(){
