@@ -14,7 +14,7 @@ import com.nes8.components.bus.Bus;
  * Memory range : 0x0000 to 0xFFFF
  */
 
-public class CPU implements Processor{
+public class CPU{
     // Registers
     public int programCounter =  0x8000;
     public byte stackPointer = 0 ; 
@@ -54,7 +54,7 @@ public class CPU implements Processor{
     public CPU(Bus bus, int pgr_rom_size){
         this.bus = bus;
         this.byteCodeLastAddress = this.programCounter + pgr_rom_size;
-        bus.setProcessor(this);
+        bus.setCPU(this);
     }
 
     private void cycle(byte cycles) throws InterruptedException{
@@ -65,7 +65,7 @@ public class CPU implements Processor{
 
     public void interpret() throws InterruptedException{
         while(programCounter <= this.byteCodeLastAddress){
-            byte inst = bus.read(programCounter);
+            byte inst = bus.cpuRead(programCounter);
             System.out.print(Integer.toHexString(programCounter) + "    ");
             byte cycles = isa.getOpcode(inst).execute();
             cycle(cycles);

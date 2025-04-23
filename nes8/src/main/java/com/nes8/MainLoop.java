@@ -3,9 +3,9 @@ package com.nes8;
 import java.io.IOException;
 
 import com.nes8.memory.ROM;
-import com.nes8.components.bus.*;
-import com.nes8.components.CPU;
-import com.nes8.components.PPU;
+import com.nes8.components.bus.Bus;
+import com.nes8.components.processor.CPU;
+import com.nes8.components.processor.PPU;
 import com.nes8.components.Controller;
 
 
@@ -14,13 +14,12 @@ public class MainLoop
     public static void main(String[] args) throws IOException, InterruptedException{
         ROM rom = new ROM(Settings.ROM_PATH);
         if(!rom.initROM()) return;
-        CPUBus cpuBus = new CPUBus(rom);
-        CPU cpu = new CPU(cpuBus,rom.pgr_rom_size);
+        Bus bus = new Bus(rom);
+        CPU cpu = new CPU(bus,rom.pgr_rom_size);
 
-        PPUBus ppuBus = new PPUBus(rom);
-        PPU ppu = new PPU(ppuBus);
+        PPU ppu = new PPU(bus);
        
-        Controller.init(cpuBus);
+        Controller.init(bus);
 
         new Thread( () -> {
                 try{

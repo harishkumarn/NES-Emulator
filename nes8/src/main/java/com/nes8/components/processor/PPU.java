@@ -9,11 +9,11 @@ import com.nes8.components.bus.Bus;
 /**
  * Memory range : 0x0000 to 0x3FFF
  */
-public class PPU implements Processor{
+public class PPU {
     Bus bus;
 
     PatternTable pt1, pt2 ;
-    NameTable nt;    
+    public NameTable nt;    
     Pallete pallete;
     OutputBuffer gui ;
 
@@ -25,7 +25,7 @@ public class PPU implements Processor{
         this.pt1 = new PatternTable(bus);
         this.pt2 = new PatternTable(bus);
         this.gui = new OutputBuffer();
-        bus.setProcessor(this);
+        bus.setPPU(this);
     }
 
     public void start(){

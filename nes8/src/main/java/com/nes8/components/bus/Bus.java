@@ -1,13 +1,51 @@
 package com.nes8.components.bus;
 
-import com.nes8.components.processor.Processor;
+import com.nes8.memory.RAM;
+import com.nes8.memory.ROM;
+import com.nes8.components.processor.*;
 
-public interface Bus{
+public class Bus{
 
-    public byte read(int address);
+    public ROM rom ;
+    private RAM ram = new RAM();
+    CPU cpu;
+    PPU ppu;
 
-    public void write(int address, byte value);
+    public Bus(ROM rom){
+        this.rom = rom;
+    }
 
-    public void setProcessor(Processor p);
+    public byte cpuRead(int address){
+        if(address >= 0x8000 && address <= 0xBFFF){
+            return rom.pgr_ROM[address - 0x8000 ];
+        }else if(address >= 0x2000 && address <= 0x2007){
+            
+        }
+        return ram.read(address);
+    }
+
+    public byte ppuRead(int address){
+        if(address >= 0x0000 && address <= 0x1FFF){
+            return rom.chr_ROM[address];
+        }
+        return 0;
+    }
+
+    public void cpuWrite(int address, byte value){
+        ram.write(address, value);
+    }
+
+
+    public void ppuWrite(int address, byte value){
+
+    }
+
+    public void setCPU(CPU cpu){
+        this.cpu = cpu;
+    }
+
+    public void setPPU(PPU ppu){
+        this.ppu = ppu;
+    }
     
 }

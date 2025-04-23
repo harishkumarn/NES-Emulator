@@ -33,8 +33,8 @@ public class PatternTable {
        
         for(int j = 0 ; j < 128;j+=8){
             for(int i = 0 ; i < 128; i+= 8  ){
-                for(int k = 0; k < 8;++k) lowByte[k] = bus.read(address++);//plane 1
-                for(int k = 0; k < 8;++k) highByte[k] = bus.read(address++);//plane 2
+                for(int k = 0; k < 8;++k) lowByte[k] = bus.ppuRead(address++);//plane 1
+                for(int k = 0; k < 8;++k) highByte[k] = bus.ppuRead(address++);//plane 2
                 for(int k = 0; k < 8;++k){
                     for(int l = 7; l >= 0;--l){
                         x = i + ( 7 - l );
