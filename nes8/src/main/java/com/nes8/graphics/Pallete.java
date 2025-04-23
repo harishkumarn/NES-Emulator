@@ -39,13 +39,24 @@ public class Pallete {
     private byte[][] foreGround = new byte[4][4];
 
     public void updatePalette(int address, byte index){
-        // TODO: handle mirrored pallete addresses
+        // ppuRead will return the address after masking the mirrorred address
         if(address >= 0x3F00 && address <= 0x3F0F){
             int relative = address - 0x3F00;
             backGround[relative / 4][relative % 4 ] = index; 
         }else{
             int relative  = address - 0X3F10;
             foreGround[relative / 4][relative % 4] = index;
+        }
+    }
+
+    public byte readPallete(int address){
+        // ppuRead will return the address after masking the mirrorred address
+        if(address >= 0x3F00 && address <= 0x3F0F){
+            int relative = address - 0x3F00;
+            return backGround[relative / 4][relative % 4];
+        }else{
+            int relative  = address - 0X3F10;
+            return foreGround[relative / 4][relative % 4];
         }
     }
 }

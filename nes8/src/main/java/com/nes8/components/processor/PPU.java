@@ -14,7 +14,7 @@ public class PPU {
 
     PatternTable pt1, pt2 ;
     public NameTable nt;    
-    Pallete pallete;
+    public Pallete pallete;
     OutputBuffer gui ;
 
     //8 PPU registers memory mapped from 0x2000 to 0x2007

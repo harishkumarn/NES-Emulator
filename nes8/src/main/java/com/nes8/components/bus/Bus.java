@@ -27,6 +27,12 @@ public class Bus{
     public byte ppuRead(int address){
         if(address >= 0x0000 && address <= 0x1FFF){
             return rom.chr_ROM[address];
+        }else if(address >= 0x2000 && address <= 0x27FF){
+            // TODO : Handle mirrors
+            return ppu.nt.vram[address - 0x2000];
+        }else if(address >=0x3000 && address <= 0x3FF ){
+            // TODO : Handle mirrors
+            return ppu.pallete.readPallete(address);
         }
         return 0;
     }
