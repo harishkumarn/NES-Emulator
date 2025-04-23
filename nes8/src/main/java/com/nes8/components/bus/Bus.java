@@ -17,11 +17,10 @@ public class Bus{
 
     public byte cpuRead(int address){
         if(address >= 0x0000 && address <= 0x1FFF){
-            return ram.read(address & 0x07FF);
+            return ram.read(address & 0x07FF);// Mirrored every 2KB
         }
         else if(address >= 0x2000 && address <= 0x3FFF){
-            // TODO : mirror of every 8 bytes
-            return ppu.registers[address - 0x2000];
+            return ppu.registers[(address - 0x2000 ) & 0x7];// mirrored every 8 bytes
         }
         else if(address >= 0x4000 && address <= 0x4017){
             // TODO : APU
@@ -54,11 +53,10 @@ public class Bus{
 
     public void cpuWrite(int address, byte value){
         if(address >= 0x0000 && address <= 0x1FFF){
-            ram.write(address & 0x07FF, value);
+            ram.write(address & 0x07FF, value);// Mirrored every 2KB
         }
         else if(address >= 0x2000 && address <= 0x3FFF){
-            // TODO : mirror of every 8 bytes
-            ppu.registers[address - 0x2000] = value;
+            ppu.registers[(address - 0x2000 ) & 0x7] = value;// mirrored every 8 bytes
         }
         else if(address >= 0x4000 && address <= 0x4017){
             // TODO : APU
