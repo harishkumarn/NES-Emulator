@@ -1,11 +1,13 @@
 package com.nes8.graphics;
 
-import com.nes8.components.Bus;
+import com.nes8.components.bus.Bus;
 
 import java.awt.Color;
  
 /**
  * Range : 0X0000 to 0x1FFF
+ * -> This range is memory mapped to the first 8 KB of the ROM, i.e., CHR-ROM
+ * -> PPU can access this using ppuRead API
  * PT1 - 0x0000 to 0x0FFF - 4KB
  * PT2 - 0X1000 to 0x1FFF - 4KB  
  */
@@ -15,7 +17,7 @@ public class PatternTable {
     public static int PT_WIDTH = 16*8;
     public static int PT_HEIGHT = 16*8;
 
-    private Color[][] pt = new Color[PT_WIDTH][PT_HEIGHT];
+    private Color[][] pt = new Color[PT_HEIGHT][PT_WIDTH];
 
     public PatternTable(Bus bus ){
         this.bus = bus;
@@ -31,8 +33,8 @@ public class PatternTable {
        
         for(int j = 0 ; j < 128;j+=8){
             for(int i = 0 ; i < 128; i+= 8  ){
-                for(int k = 0; k < 8;++k) lowByte[k] = bus.rom.chr_ROM[address++];//plane 1
-                for(int k = 0; k < 8;++k) highByte[k] = bus.rom.chr_ROM[address++];//plane 2
+                for(int k = 0; k < 8;++k) lowByte[k] = bus.read(address++);//plane 1
+                for(int k = 0; k < 8;++k) highByte[k] = bus.read(address++);//plane 2
                 for(int k = 0; k < 8;++k){
                     for(int l = 7; l >= 0;--l){
                         x = i + ( 7 - l );

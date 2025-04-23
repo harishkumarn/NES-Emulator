@@ -1,5 +1,7 @@
 package com.nes8.components;
 
+import com.nes8.components.bus.Bus;
+
 public class Controller {
     Bus bus;
 

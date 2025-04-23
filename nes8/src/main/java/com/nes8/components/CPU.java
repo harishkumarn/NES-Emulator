@@ -4,6 +4,7 @@ import com.nes8.Settings;
 import com.nes8.components.software.ISA;
 import com.nes8.graphics.ObjectAttributeMemory;
 import java.util.Stack;
+import com.nes8.components.bus.Bus;
 
 
 /**
@@ -48,9 +49,9 @@ public class CPU {
     ISA isa = new ISA(this);
 
 
-    public CPU(Bus bus){
+    public CPU(Bus bus, int pgr_rom_size){
         this.bus = bus;
-        this.byteCodeLastAddress = this.programCounter + this.bus.pgr_rom_size;
+        this.byteCodeLastAddress = this.programCounter + pgr_rom_size;
 
     }
 
@@ -62,7 +63,7 @@ public class CPU {
 
     public void interpret() throws InterruptedException{
         while(programCounter <= this.byteCodeLastAddress){
-            byte inst = bus.getByteCode(programCounter);
+            byte inst = bus.read(programCounter);
             System.out.print(Integer.toHexString(programCounter) + "    ");
             byte cycles = isa.getOpcode(inst).execute();
             cycle(cycles);

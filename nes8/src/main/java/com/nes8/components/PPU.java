@@ -4,6 +4,7 @@ package com.nes8.components;
 import com.nes8.Settings;
 import com.nes8.components.helper.Display;
 import com.nes8.graphics.*;
+import com.nes8.components.bus.Bus;
 
 /**
  * Memory range : 0x0000 to 0x3FFF
@@ -14,7 +15,7 @@ public class PPU {
     PatternTable pt1, pt2 ;
     NameTable nt;    
     Pallete pallete;
-    GameUI gui ;
+    OutputBuffer gui ;
 
     //8 PPU registers memory mapped from 0x2000 to 0x2007
     byte[] registers = new byte[8];
@@ -23,7 +24,7 @@ public class PPU {
         this.bus = bus;
         this.pt1 = new PatternTable(bus);
         this.pt2 = new PatternTable(bus);
-        this.gui = new GameUI();
+        this.gui = new OutputBuffer();
     }
 
     public void start(){
