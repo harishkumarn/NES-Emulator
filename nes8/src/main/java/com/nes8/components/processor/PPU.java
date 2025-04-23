@@ -18,7 +18,7 @@ public class PPU {
     OutputBuffer gui ;
 
     //8 PPU registers memory mapped from 0x2000 to 0x2007
-    byte[] registers = new byte[8];
+    public byte[] registers = new byte[8];
 
     public PPU(Bus bus){
         this.bus = bus;

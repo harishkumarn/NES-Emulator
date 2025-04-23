@@ -16,12 +16,28 @@ public class Bus{
     }
 
     public byte cpuRead(int address){
-        if(address >= 0x8000 && address <= 0xBFFF){
-            return rom.pgr_ROM[address - 0x8000 ];
-        }else if(address >= 0x2000 && address <= 0x2007){
-            
+        if(address >= 0x0000 && address <= 0x1FFF){
+            // TODO : mirror of every 1 KB
+            return ram.read(address);
         }
-        return ram.read(address);
+        else if(address >= 0x2000 && address <= 0x3FFF){
+            // TODO : mirror of every 8 bytes
+            return ppu.registers[address - 0x2000];
+        }
+        else if(address >= 0x4000 && address <= 0x4017){
+            // TODO : APU
+        }
+        else if(address >= 4020 && address <= 0x5FFF){
+            // Cartridge expansion
+        }
+        else if(address >= 6000 && address <= 0x7FFF){
+            // Cartridge SRAM ( If present - battery backed save RAM)
+        }    
+        else if(address >= 0x8000 && address <= 0xFFFF){
+            // Bank switched by Mapper
+            return rom.pgr_ROM[address - 0x8000 ];
+        }
+        return 0;
     }
 
     public byte ppuRead(int address){
@@ -30,7 +46,7 @@ public class Bus{
         }else if(address >= 0x2000 && address <= 0x27FF){
             // TODO : Handle mirrors
             return ppu.nt.vram[address - 0x2000];
-        }else if(address >=0x3000 && address <= 0x3FF ){
+        }else if(address >=0x3000 && address <= 0x3FFF ){
             // TODO : Handle mirrors
             return ppu.pallete.readPallete(address);
         }
@@ -38,7 +54,23 @@ public class Bus{
     }
 
     public void cpuWrite(int address, byte value){
-        ram.write(address, value);
+        if(address >= 0x0000 && address <= 0x1FFF){
+            // TODO : mirror of every 1 KB
+            ram.write(address, value);
+        }
+        else if(address >= 0x2000 && address <= 0x3FFF){
+            // TODO : mirror of every 8 bytes
+            ppu.registers[address - 0x2000] = value;
+        }
+        else if(address >= 0x4000 && address <= 0x4017){
+            // TODO : APU
+        }
+        else if(address >= 4020 && address <= 0x5FFF){
+            // Cartridge expansion
+        }
+        else if(address >= 6000 && address <= 0x7FFF){
+            // Cartridge SRAM ( If present - battery backed save RAM)
+        }    
     }
 
 
