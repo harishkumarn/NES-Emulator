@@ -17,8 +17,7 @@ public class Bus{
 
     public byte cpuRead(int address){
         if(address >= 0x0000 && address <= 0x1FFF){
-            // TODO : mirror of every 1 KB
-            return ram.read(address);
+            return ram.read(address & 0x07FF);
         }
         else if(address >= 0x2000 && address <= 0x3FFF){
             // TODO : mirror of every 8 bytes
@@ -28,13 +27,13 @@ public class Bus{
             // TODO : APU
         }
         else if(address >= 4020 && address <= 0x5FFF){
-            // Cartridge expansion
+            // TODO :Cartridge expansion
         }
         else if(address >= 6000 && address <= 0x7FFF){
-            // Cartridge SRAM ( If present - battery backed save RAM)
+            // TODO : Cartridge SRAM ( If present - battery backed save RAM)
         }    
         else if(address >= 0x8000 && address <= 0xFFFF){
-            // Bank switched by Mapper
+            // TODO : Bank switched by Mapper
             return rom.pgr_ROM[address - 0x8000 ];
         }
         return 0;
@@ -55,8 +54,7 @@ public class Bus{
 
     public void cpuWrite(int address, byte value){
         if(address >= 0x0000 && address <= 0x1FFF){
-            // TODO : mirror of every 1 KB
-            ram.write(address, value);
+            ram.write(address & 0x07FF, value);
         }
         else if(address >= 0x2000 && address <= 0x3FFF){
             // TODO : mirror of every 8 bytes
@@ -66,10 +64,10 @@ public class Bus{
             // TODO : APU
         }
         else if(address >= 4020 && address <= 0x5FFF){
-            // Cartridge expansion
+            // TODO : Cartridge expansion
         }
         else if(address >= 6000 && address <= 0x7FFF){
-            // Cartridge SRAM ( If present - battery backed save RAM)
+            // TODO : Cartridge SRAM ( If present - battery backed save RAM)
         }    
     }
 
