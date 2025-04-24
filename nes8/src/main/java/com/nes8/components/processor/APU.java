@@ -1,4 +1,4 @@
-package com.nes8.components;
+package com.nes8.components.processor;
 
 /**
  * NES has over 5 Audio channels
