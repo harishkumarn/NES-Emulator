@@ -5,6 +5,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import com.nes8.components.mappers.MMC0;
+import com.nes8.components.mappers.MMC1;
+import com.nes8.components.mappers.MemoryMappingController;
+
 public class ROM {
 
 
@@ -14,6 +18,7 @@ public class ROM {
     }
 
     public byte[] pgr_ROM , chr_ROM ;
+    public MemoryMappingController mmc ;
     NameTableArrangeMent nTableArrangeMent;
     BufferedInputStream br = null;
     public int pgr_rom_size = 0;
@@ -72,8 +77,10 @@ public class ROM {
         System.out.println("\n\nMapper id " +  mapper);
         switch(mapper){
             case 0:
+            this.mmc = new MMC0();
             break;
             case 1:
+            this.mmc = new MMC1();
             break;
             case 2:
             break;

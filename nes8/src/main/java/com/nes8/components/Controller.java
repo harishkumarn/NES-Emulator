@@ -11,6 +11,7 @@ public class Controller {
 
     private Controller(Bus bus){
         this.bus = bus;
+        bus.setController(this);
     }
 
     public static void init(Bus bus){

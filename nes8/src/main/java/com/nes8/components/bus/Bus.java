@@ -33,7 +33,7 @@ public class Bus{
             // TODO :Cartridge expansion
         }
         else if(address >= 6000 && address <= 0x7FFF){
-            // TODO : Cartridge SRAM ( If present - battery backed save RAM)
+            return rom.mmc.read(address);
         }    
         else if(address >= 0x8000 && address <= 0xFFFF){
             // TODO : Bank switched by Mapper
@@ -76,7 +76,7 @@ public class Bus{
             // TODO : Cartridge expansion
         }
         else if(address >= 6000 && address <= 0x7FFF){
-            // TODO : Cartridge SRAM ( If present - battery backed save RAM)
+            rom.mmc.write(address, value);
         }    
     }
 
