@@ -3,6 +3,7 @@ package com.nes8.components.bus;
 import com.nes8.memory.RAM;
 import com.nes8.memory.ROM;
 import com.nes8.components.processor.*;
+import com.nes8.components.Controller;
 
 public class Bus{
 
@@ -10,6 +11,7 @@ public class Bus{
     private RAM ram = new RAM();
     CPU cpu;
     PPU ppu;
+    Controller controller;
 
     public Bus(ROM rom){
         this.rom = rom;
@@ -22,8 +24,10 @@ public class Bus{
         else if(address >= 0x2000 && address <= 0x3FFF){
             return ppu.registers[(address - 0x2000 ) & 0x7];// mirrored every 8 bytes
         }
-        else if(address >= 0x4000 && address <= 0x4017){
+        else if(address >= 0x4000 && address <= 0x4015){
             // TODO : APU
+        }else if(address == 0x4016 || address == 0x4017){
+            return controller.rightShiftRegister(address);
         }
         else if(address >= 4020 && address <= 0x5FFF){
             // TODO :Cartridge expansion
@@ -57,8 +61,16 @@ public class Bus{
         else if(address >= 0x2000 && address <= 0x3FFF){
             ppu.registers[(address - 0x2000 ) & 0x7] = value;// mirrored every 8 bytes
         }
-        else if(address >= 0x4000 && address <= 0x4017){
+        else if(address >= 0x4000 && address <= 0x4015){
             // TODO : APU
+        }
+        else if(address == 0x4016 ){
+            if(value == 1){
+                controller.loadShiftRegisters();
+            }
+        }
+        else if(address <= 0x4017){
+            // APU 
         }
         else if(address >= 4020 && address <= 0x5FFF){
             // TODO : Cartridge expansion
@@ -79,6 +91,10 @@ public class Bus{
 
     public void setPPU(PPU ppu){
         this.ppu = ppu;
+    }
+
+    public void setController(Controller c){
+        this.controller = c;
     }
     
 }
