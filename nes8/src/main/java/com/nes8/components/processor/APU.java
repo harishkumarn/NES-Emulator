@@ -8,7 +8,7 @@ import com.nes8.components.bus.Bus;
 public class APU {
     byte[] pulseChannel1 = new byte[4];
     byte[] pulseChannel2 = new byte[4];
-    byte[] triangeChannel = new byte[4];
+    byte[] triangleChannel = new byte[4];
     byte[] noiseChannel = new byte[4];
     byte[] deltaModulationChannel = new byte[4];
 
@@ -19,20 +19,20 @@ public class APU {
     }
 
     public void startSound(){
-        
+
     }
 
     public void write(int address, byte value){
         if(address >= 0x4000 && address <= 0x4003){
             pulseChannel1[address - 0x4000] = value;
         }else  if(address >= 0x4004 && address <= 0x4007){
-            pulseChannel1[address - 0x4004] = value;
+            pulseChannel2[address - 0x4004] = value;
         }else  if(address >= 0x4008 && address <= 0x400B){
-            pulseChannel1[address - 0x4008] = value;
+            triangleChannel[address - 0x4008] = value;
         }else  if(address >= 0x400C && address <= 0x400F){
-            pulseChannel1[address - 0x400C] = value;
+            noiseChannel[address - 0x400C] = value;
         }else  if(address >= 0x4010 && address <= 0x4013){
-            pulseChannel1[address - 0x4010] = value;
+            deltaModulationChannel[address - 0x4010] = value;
         }else if(address == 0x4015){
             statusRegister = value;
         }else if(address == 0x4017){

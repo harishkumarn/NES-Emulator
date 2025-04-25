@@ -77,10 +77,10 @@ public class ROM {
         System.out.println("\n\nMapper id " +  mapper);
         switch(mapper){
             case 0:
-            this.mmc = new MMC0();
+            this.mmc = new MMC0(this);
             break;
             case 1:
-            this.mmc = new MMC1();
+            this.mmc = new MMC1(this);
             break;
             case 2:
             break;

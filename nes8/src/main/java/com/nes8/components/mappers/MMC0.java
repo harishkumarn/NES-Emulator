@@ -1,6 +1,14 @@
 package com.nes8.components.mappers;
 
+import com.nes8.memory.ROM;
+
 public class MMC0 implements MemoryMappingController{
+
+    ROM rom;
+
+    public MMC0(ROM rom){
+        this.rom = rom;
+    }
 
     @Override
     public byte read(int address) {
@@ -11,5 +19,4 @@ public class MMC0 implements MemoryMappingController{
     public void write(int address, byte value) {
         
     }
-    
 }

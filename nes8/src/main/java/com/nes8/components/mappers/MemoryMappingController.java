@@ -4,6 +4,4 @@ public interface MemoryMappingController {
     public byte read(int address);
 
     public void write(int address, byte value);
-
-
 }
