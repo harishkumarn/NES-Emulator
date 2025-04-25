@@ -8,13 +8,15 @@ import com.nes8.components.Controller;
 public class Bus{
 
     public ROM rom ;
-    private RAM ram = new RAM();
+    private RAM ram;
     CPU cpu;
     PPU ppu;
+    APU apu;
     Controller controller;
 
-    public Bus(ROM rom){
+    public Bus(ROM rom, RAM ram){
         this.rom = rom;
+        this.ram = ram;
     }
 
     public byte cpuRead(int address){
@@ -61,16 +63,13 @@ public class Bus{
         else if(address >= 0x2000 && address <= 0x3FFF){
             ppu.registers[(address - 0x2000 ) & 0x7] = value;// mirrored every 8 bytes
         }
-        else if(address >= 0x4000 && address <= 0x4015){
-            // TODO : APU
+        else if((address >= 0x4000 && address <= 0x4013) || address == 0x4015 || address == 0x4017){
+            apu.write(address, value);
         }
         else if(address == 0x4016 ){
             if(value == 1){
                 controller.loadShiftRegisters();
             }
-        }
-        else if(address <= 0x4017){
-            // APU 
         }
         else if(address >= 4020 && address <= 0x5FFF){
             // TODO : Cartridge expansion
@@ -97,4 +96,7 @@ public class Bus{
         this.controller = c;
     }
     
+    public void setAPU(APU apu){
+        this.apu = apu;
+    }
 }
