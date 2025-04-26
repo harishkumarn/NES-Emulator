@@ -19,7 +19,7 @@ public class ROM {
         VERTICAL // 64x30 -> Games with horizontal scroll
     }
 
-    public byte[] pgr_ROM , chr_ROM ;
+    public byte[] pgr_ROM , pt_data;
     public MemoryMappingController mmc ;
     NameTableArrangeMent nTableArrangeMent;
     BufferedInputStream br = null;
@@ -64,11 +64,11 @@ public class ROM {
             pgr_ROM = new byte[pgr_rom_size ];
             System.out.println("Pgr ROM bytes read : " +  br.read(pgr_ROM));
             if(chr_rom_size > 0 ){
-                chr_ROM = new byte[chr_rom_size];
-                System.out.println("Chr ROM bytes read : " +  br.read(chr_ROM));
+                pt_data = new byte[chr_rom_size];
+                System.out.println("Chr ROM bytes read : " +  br.read(pt_data));
             }else{
-                System.out.println("Chr ROM is empty, hence alloting 8KB ");
-                chr_ROM = new byte[8 * Constants.ONE_KB];
+                System.out.println("Chr ROM is empty, hence alloting 8KB for char RAM");
+                pt_data = new byte[8 * Constants.ONE_KB];
             }
             status = setMapper(mapper);
         }catch(Exception e){

@@ -12,12 +12,18 @@ public class MMC1 implements MemoryMappingController{
 
     @Override
     public byte read(int address) {
-       return 0;
+        if(address >= 0x0000 && address <= 0x1FFF){
+            return  rom.pt_data[address];
+        }
+        return 0;
     }
 
     @Override
     public void write(int address, byte value) {
-        
+        // Will be from PPU, as CPU writes to 0x2006/0x2007 to access this address range as 0x0000 to 0x1FFF is mapped to CPU's RAM in the BUS
+        if(address >= 0x0000 && address <= 0x1FFF){
+            rom.pt_data[address] = value;
+        }
     }
     
 }

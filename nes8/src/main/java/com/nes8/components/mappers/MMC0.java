@@ -12,8 +12,11 @@ public class MMC0 implements MemoryMappingController{
 
     @Override
     public byte read(int address) {
+        if(address >= 0x0000 && address <= 0x1FFF){
+            return rom.pt_data[address];
+        }
         if(address >=  0x6000 && address <= 0x7FFF){
-            // SRAM
+            // TODO : SRAM
             System.out.println("Attempt to write to SRAM");
         }
         else if(address >= 0x8000 && address <= 0xBFFF){
