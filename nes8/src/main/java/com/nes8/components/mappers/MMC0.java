@@ -1,5 +1,7 @@
 package com.nes8.components.mappers;
 
+import com.nes8.Constants;
+import com.nes8.Settings;
 import com.nes8.memory.ROM;
 
 public class MMC0 implements MemoryMappingController{
@@ -23,13 +25,17 @@ public class MMC0 implements MemoryMappingController{
             return rom.pgr_ROM[address - 0x8000];
         }
         else if(address >= 0xC000 && address <= 0xFFFF){
-            // TODO : Last 16KB if NROM- 256, mirror of 0x8000 - 0xBFFF if NROM - 128
+            // Last 16KB if NROM- 256, mirror of 0x8000 - 0xBFFF if NROM - 128
+            if(rom.pgr_ROM.length > 16 * Constants.ONE_KB) return rom.pgr_ROM[address];
+            else return rom.pgr_ROM[address & 0xBFFF];// TODO : double check mirroring once
         }
         return 0;
     }
 
     @Override
     public void write(int address, byte value) {
-        
+        if(address >= 0x0000 && address <= 0x1FFF){
+            rom.pt_data[address] = value;
+        }
     }
 }
