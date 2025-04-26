@@ -1,7 +1,9 @@
 package com.nes8.memory;
 
+import com.nes8.Constants;
+
 public class RAM {
-    byte[] memory = new byte[0x0800];// 2 KB
+    byte[] memory = new byte[2 * Constants.ONE_KB];// 2 KB
 
     public byte read(int i){
         return memory[i];

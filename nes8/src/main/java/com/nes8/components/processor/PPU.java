@@ -14,7 +14,7 @@ public class PPU {
 
     PatternTable pt1, pt2 ;
     public NameTable nt;    
-    public Pallete pallete;
+    public Pallete pallete = new Pallete();
     OutputBuffer gui ;
 
     //8 PPU registers memory mapped from 0x2000 to 0x2007
@@ -36,7 +36,7 @@ public class PPU {
     private void initPatternTables(){
         pt1.init(0x0000);
         pt2.init(0x1000);
-        if(Settings.RENDER_PATTERN_TABLE){
+        if(Settings.RENDER_META_DATA){
             Display.init(PatternTable.PT_WIDTH, PatternTable.PT_HEIGHT, Settings.PT_SCALE, pt1.getPixels(),  "PT-1");
             Display.init(PatternTable.PT_WIDTH, PatternTable.PT_HEIGHT, Settings.PT_SCALE, pt2.getPixels(), "PT-2");
         }

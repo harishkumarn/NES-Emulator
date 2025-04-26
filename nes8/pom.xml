@@ -22,6 +22,17 @@
       <artifactId>javafx-swing</artifactId>
       <version>21</version>
     </dependency>
+    <dependency>
+        <groupId>net.java.jinput</groupId>
+        <artifactId>jinput</artifactId>
+        <version>2.0.10</version>
+    </dependency>
+    <dependency>
+        <groupId>net.java.jinput</groupId>
+        <artifactId>jinput</artifactId>
+        <version>2.0.10</version>
+        <classifier>natives-all</classifier>
+    </dependency>
   </dependencies>
 
   <build>
@@ -62,6 +73,10 @@
         <plugin>
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>3.0.0</version>
+        </plugin>
+        <plugin>
+          <groupId>com.googlecode.mavennatives</groupId>
+          <artifactId>maven-nativedependencies-plugin</artifactId>
         </plugin>
       </plugins>
     </pluginManagement>

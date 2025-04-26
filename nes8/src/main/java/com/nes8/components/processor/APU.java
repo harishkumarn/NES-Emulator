@@ -39,4 +39,8 @@ public class APU {
             frameCounter = value;
         }
     }
+
+    public byte getStatusRegister(){
+        return this.statusRegister;
+    }
 }

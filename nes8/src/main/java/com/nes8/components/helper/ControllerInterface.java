@@ -12,12 +12,16 @@ public class ControllerInterface {
     }
 
     public ControllerInterface(){
+        init();
+    }
 
+    public void init(){
+        
     }
 
     Type type = Settings.CONTROLLER_TYPE;
 
     public byte[] getKeyPressData(){
         return new byte[]{0,0};
-    }
+    }   
 }

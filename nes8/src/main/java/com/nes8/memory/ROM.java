@@ -5,8 +5,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import com.nes8.Constants;
 import com.nes8.components.mappers.MMC0;
 import com.nes8.components.mappers.MMC1;
+import com.nes8.components.mappers.MMC2;
 import com.nes8.components.mappers.MemoryMappingController;
 
 public class ROM {
@@ -45,8 +47,8 @@ public class ROM {
             }
             int mapper = 0, hintScreenData = 0 ;
             if(fileType == 1){
-                pgr_rom_size = header[4] & 0xFF;
-                chr_rom_size = header[5]  & 0xFF;
+                pgr_rom_size = header[4] ;
+                chr_rom_size = header[5] ;
                 mapper = (header[7] & 0xF0 ) | ((header[6] & 0xF0) >> 4 ) ;
                 hintScreenData = (header[7] & 2) == 2 ? 8192 : 0 ;
             }else{// bytes 8-15 in NES 2 format
@@ -55,14 +57,19 @@ public class ROM {
                 mapper = ((header[6] & 0xF) << 8 ) | (header[7] & 0xF0 ) | ((header[6] & 0xF0) >> 4 ) ;
             }
             System.out.println("iNES File Format : " + fileType + "\n\n");
-            pgr_rom_size *= 16384;
-            chr_rom_size = chr_rom_size * 8192 + hintScreenData;
+            pgr_rom_size *= 16 * Constants.ONE_KB;
+            chr_rom_size = chr_rom_size * 8 * Constants.ONE_KB + hintScreenData;
             System.out.println("Pgr ROM size  : " +  pgr_rom_size + " Bytes");
             System.out.println("Chr size  : " + chr_rom_size + " Bytes\n\n");
             pgr_ROM = new byte[pgr_rom_size ];
-            chr_ROM = new byte[chr_rom_size ];
             System.out.println("Pgr ROM bytes read : " +  br.read(pgr_ROM));
-            System.out.println("Chr ROM bytes read : " +  br.read(chr_ROM));
+            if(chr_rom_size > 0 ){
+                chr_ROM = new byte[chr_rom_size];
+                System.out.println("Chr ROM bytes read : " +  br.read(chr_ROM));
+            }else{
+                System.out.println("Chr ROM is empty, hence alloting 8KB ");
+                chr_ROM = new byte[8 * Constants.ONE_KB];
+            }
             status = setMapper(mapper);
         }catch(Exception e){
             System.err.println(e);
@@ -83,6 +90,7 @@ public class ROM {
             this.mmc = new MMC1(this);
             break;
             case 2:
+            this.mmc = new MMC2(this);
             break;
             case 3:
             break;

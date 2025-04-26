@@ -15,7 +15,7 @@ public class Display extends JPanel{
         this.h = h;
         this.scale = scale;
         this.pixels = pixels;
-        setPreferredSize(new Dimension(w * scale, w * scale));
+        setPreferredSize(new Dimension(w * scale, h * scale));
 
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame(name);

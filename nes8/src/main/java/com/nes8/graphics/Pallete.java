@@ -2,6 +2,9 @@ package com.nes8.graphics;
 
 import java.awt.Color;
 
+import com.nes8.Settings;
+import com.nes8.components.helper.Display;
+
 
 /**
  * Range : 0x3F00 to 0x3FFF 
@@ -34,6 +37,28 @@ public class Pallete {
         new Color(248, 216, 120), new Color(216, 248, 120), new Color(184, 248, 184), new Color(184, 248, 216),
         new Color(0, 252, 252),   new Color(248, 216, 248), new Color(0, 0, 0),       new Color(0, 0, 0)
     };
+
+    public Pallete(){
+        if(Settings.RENDER_META_DATA){
+            renderPallete();
+        }
+    }
+
+    public void renderPallete(){
+        Color[][] screen = new Color[16*8][4*8];
+        int pi = 0 ;
+        for(int i = 0 ; i < 16*8; i += 8){
+            for(int j = 0 ; j < 4*8 ; j += 8 ){
+                for(int x = 0 ; x < 8 ; ++x){
+                    for(int y = 0;  y < 8 ;++y){
+                        screen[i + x][j + y] = pallete[pi];
+                    }
+                }
+                pi++;
+            }
+        }
+        Display.init(16*8, 32, Settings.PT_SCALE, screen, "Pallete");
+    }
 
     private byte[][] backGround = new byte[4][4];
     private byte[][] foreGround = new byte[4][4];
