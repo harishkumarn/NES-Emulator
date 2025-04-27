@@ -4,6 +4,7 @@ import com.nes8.memory.RAM;
 import com.nes8.memory.ROM;
 import com.nes8.components.processor.*;
 import com.nes8.components.Controller;
+import com.nes8.components.DMA;
 
 public class Bus{
 
@@ -59,7 +60,7 @@ public class Bus{
         else if((address >= 0x4000 && address <= 0x4013) || address == 0x4015 || address == 0x4017){
             apu.write(address, value);
         }else if(address == 0x4014){
-            //TODO : OAM DMA transfer
+            DMA.startDMATransfer(address, ram, ppu);
         }
         else if(address == 0x4016 ){
             if(value == 1){

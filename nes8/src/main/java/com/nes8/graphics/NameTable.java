@@ -1,5 +1,6 @@
 package com.nes8.graphics;
 
+import com.nes8.Constants;
 
 /*
  * This is basically the "VRAM" of the NES
@@ -16,6 +17,6 @@ package com.nes8.graphics;
  * 
  */
 public class NameTable {
-    public byte[] vram = new byte[0x0800]; // 2 KB
+    public byte[] vram = new byte[2 * Constants.ONE_KB]; // 2 KB
 }
 

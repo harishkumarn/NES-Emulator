@@ -20,6 +20,8 @@ public class ROM {
     }
 
     public byte[] pgr_ROM , pt_data;
+    public byte[] sram = initSRAM();
+    public boolean sramModified = false;
     public MemoryMappingController mmc ;
     NameTableArrangeMent nTableArrangeMent;
     BufferedInputStream br = null;
@@ -67,7 +69,7 @@ public class ROM {
                 pt_data = new byte[chr_rom_size];
                 System.out.println("Chr ROM bytes read : " +  br.read(pt_data));
             }else{
-                System.out.println("Chr ROM is empty, hence alloting 8KB for char RAM");
+                System.out.println("Chr ROM is empty, hence alloting 8KB for Chr RAM");
                 pt_data = new byte[8 * Constants.ONE_KB];
             }
             status = setMapper(mapper);
@@ -127,4 +129,7 @@ public class ROM {
         return true;
     }
 
+    byte[] initSRAM(){
+        return new byte[8 * Constants.ONE_KB];
+    }
 }

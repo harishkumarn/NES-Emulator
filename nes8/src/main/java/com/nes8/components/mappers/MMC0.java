@@ -17,8 +17,7 @@ public class MMC0 implements MemoryMappingController{
             return rom.pt_data[address];
         }
         if(address >=  0x6000 && address <= 0x7FFF){
-            // TODO : SRAM
-            System.out.println("Attempt to write to SRAM");
+            return rom.sram[address - 0x6000];
         }
         else if(address >= 0x8000 && address <= 0xBFFF){
             return rom.pgr_ROM[address - 0x8000];
@@ -34,7 +33,11 @@ public class MMC0 implements MemoryMappingController{
     @Override
     public void write(int address, byte value) {
         if(address >= 0x0000 && address <= 0x1FFF){
-            rom.pt_data[address] = value;
+            rom.pt_data[address] = value;// write to CRH RAM
+        }
+        else if(address >=  0x6000 && address <= 0x7FFF){
+            rom.sramModified = true;
+            rom.sram[address - 0x6000] = value;
         }
     }
 }
