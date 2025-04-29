@@ -44,7 +44,7 @@ public class ISA {
         cpu.updateFlag(Flag.N, val < 0 );
     }
 
-    private void updateDEC_INC_Flags(byte val){
+    private void updateDEC_INC_EOR_Flags(byte val){
         cpu.updateFlag(Flag.Z, val == 0);
         cpu.updateFlag(Flag.N, val < 0 );
     }
@@ -329,6 +329,7 @@ public class ISA {
                 byte operand = cpu.bus.cpuRead(cpu.programCounter++);
                 if(cpu.getFlag(Flag.C) == 1 ){
                     cpu.programCounter = operand;
+
                 }
                 printASM("BCS "+ Integer.toHexString(operand) );
                 return (byte)cycle;
@@ -726,9 +727,9 @@ public class ISA {
             public byte execute(){
                 byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
                 byte val = (byte) (cpu.bus.cpuRead( operand1) - 1);
-                updateDEC_INC_Flags( val  );
+                updateDEC_INC_EOR_Flags( val  );
                 cpu.bus.cpuWrite(operand1, val);
-                printASM("DEC " + Integer.toHexString(operand1));
+                printASM("DEC " + Integer.toHexString(operand1)); 
                 return (byte)cycle;
             }
         });
@@ -738,7 +739,7 @@ public class ISA {
             public byte execute(){
                 byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
                 byte val = (byte) (cpu.bus.cpuRead( operand1 + cpu.indexX) - 1); 
-                updateDEC_INC_Flags( val  );
+                updateDEC_INC_EOR_Flags( val  );
                 cpu.bus.cpuWrite(  operand1 + cpu.indexX, val);
                 printASM("DEC " +  Integer.toHexString(operand1) + " ,X");
                 return (byte)cycle;
@@ -751,7 +752,7 @@ public class ISA {
                 byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
                 byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
                 byte val = (byte) (cpu.bus.cpuRead( (operand1 << 8 ) + operand2 ) - 1);
-                updateDEC_INC_Flags( val  );
+                updateDEC_INC_EOR_Flags( val  );
                 cpu.bus.cpuWrite( (operand1 << 8 ) + operand2 , val);
                 printASM("DEC " +  Integer.toHexString((operand1 << 8 ) + operand2));
                 return (byte)cycle;
@@ -764,7 +765,7 @@ public class ISA {
                 byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
                 byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
                 byte val = (byte) (cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexX) - 1) ;
-                updateDEC_INC_Flags( val  );
+                updateDEC_INC_EOR_Flags( val  );
                 cpu.bus.cpuWrite( (operand1 << 8 ) + operand2 + cpu.indexX, val);
                 printASM("DEC " +  Integer.toHexString((operand1 << 8 ) + operand2) + ", X");
                 return (byte)cycle;
@@ -777,7 +778,7 @@ public class ISA {
         opcodes.put(0xCA,new Opcode((byte)2){
             @Override
             public byte execute(){
-                updateDEC_INC_Flags( --cpu.indexX  );
+                updateDEC_INC_EOR_Flags( --cpu.indexX  );
                 printASM("DEX");
                 return (byte)cycle;
             }
@@ -789,7 +790,7 @@ public class ISA {
         opcodes.put(0x88,new Opcode((byte)2){
             @Override
             public byte execute(){
-                updateDEC_INC_Flags( --cpu.indexY  );
+                updateDEC_INC_EOR_Flags( --cpu.indexY  );
                 printASM("DEY");
                 return (byte)cycle;
             }
@@ -801,7 +802,7 @@ public class ISA {
         opcodes.put(0xE8,new Opcode((byte)2){
             @Override
             public byte execute(){
-                updateDEC_INC_Flags( ++cpu.indexX  );
+                updateDEC_INC_EOR_Flags( ++cpu.indexX  );
                 printASM("INX");
                 return (byte)cycle;
             }
@@ -813,7 +814,7 @@ public class ISA {
         opcodes.put(0xC8,new Opcode((byte)2){
             @Override
             public byte execute(){
-                updateDEC_INC_Flags( ++cpu.indexY  );
+                updateDEC_INC_EOR_Flags( ++cpu.indexY  );
                 printASM("INY");
                 return (byte)cycle;
             }
@@ -827,7 +828,7 @@ public class ISA {
             public byte execute(){
                 byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
                 byte val = (byte) (cpu.bus.cpuRead( operand1) + 1);
-                updateDEC_INC_Flags( val  );
+                updateDEC_INC_EOR_Flags( val  );
                 cpu.bus.cpuWrite(operand1, val);
                 printASM("INC " + Integer.toHexString(operand1));
                 return (byte)cycle;
@@ -839,7 +840,7 @@ public class ISA {
             public byte execute(){
                 byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
                 byte val = (byte) (cpu.bus.cpuRead( operand1 + cpu.indexX) + 1); 
-                updateDEC_INC_Flags( val  );
+                updateDEC_INC_EOR_Flags( val  );
                 cpu.bus.cpuWrite(  operand1 + cpu.indexX, val);
                 printASM("INC " +  Integer.toHexString(operand1) + " ,X");
                 return (byte)cycle;
@@ -852,7 +853,7 @@ public class ISA {
                 byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
                 byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
                 byte val = (byte) (cpu.bus.cpuRead( (operand1 << 8 ) + operand2 ) + 1);
-                updateDEC_INC_Flags( val  );
+                updateDEC_INC_EOR_Flags( val  );
                 cpu.bus.cpuWrite( (operand1 << 8 ) + operand2 , val);
                 printASM("INC " +  Integer.toHexString((operand1 << 8 ) + operand2));
                 return (byte)cycle;
@@ -865,7 +866,7 @@ public class ISA {
                 byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
                 byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
                 byte val = (byte) (cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexX) + 1) ;
-                updateDEC_INC_Flags( val  );
+                updateDEC_INC_EOR_Flags( val  );
                 cpu.bus.cpuWrite( (operand1 << 8 ) + operand2 + cpu.indexX, val);
                 printASM("INC " +  Integer.toHexString((operand1 << 8 ) + operand2) + ", X");
                 return (byte)cycle;
@@ -874,52 +875,102 @@ public class ISA {
 
          //------------------------------
         //EOR
-        opcodes.put(0x41, new Opcode((byte)2){
+        opcodes.put(0x41, new Opcode((byte)6){
             @Override
             public byte execute(){
+                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
+                int ptr = (operand + cpu.indexX) & 0xFF;
+                byte low = cpu.bus.cpuRead(ptr);
+                byte high = cpu.bus.cpuRead(ptr+1);
+                ptr = (high << 8 ) + low;
 
+                cpu.accumulator = (byte) (cpu.accumulator ^ cpu.bus.cpuRead(ptr));
+                updateDEC_INC_EOR_Flags(cpu.accumulator);
+                printASM("EOR $"+ Integer.toHexString(operand) + " ,X");
                 return (byte)cycle;
             }
         });
 
-        opcodes.put(0x45, new Opcode((byte)2){
+        opcodes.put(0x45, new Opcode((byte)3){
             @Override
             public byte execute(){
+                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
+                cpu.accumulator = (byte) (cpu.bus.cpuRead(operand) ^ cpu.accumulator);
+                updateDEC_INC_EOR_Flags(cpu.accumulator);
+                printASM("EOR $" + Integer.toHexString(operand));
                 return (byte)cycle;
             }
         });
 
-        opcodes.put(0x4D, new Opcode((byte)3){
+        opcodes.put(0x49,new Opcode((byte)2){
             @Override
             public byte execute(){
+                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
+                cpu.accumulator = (byte) (operand ^ cpu.accumulator);
+                updateDEC_INC_EOR_Flags(cpu.accumulator);
+                printASM("EOR #" + Integer.toHexString(operand));
                 return (byte)cycle;
             }
         });
 
-        opcodes.put(0x51, new Opcode((byte)2){
+        opcodes.put(0x4D, new Opcode((byte)4){
             @Override
             public byte execute(){
+                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
+                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
+                cpu.accumulator = (byte) (cpu.bus.cpuRead( (operand1 << 8 ) + operand2 ) ^ cpu.accumulator) ;
+                updateDEC_INC_EOR_Flags(cpu.accumulator);
+                printASM("EOR $" + Integer.toHexString((operand1 << 8 ) + operand2 ));
                 return (byte)cycle;
             }
         });
 
-        opcodes.put(0x55, new Opcode((byte)2){
+        opcodes.put(0x51, new Opcode((byte)5){
             @Override
             public byte execute(){
+                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
+                byte low = cpu.bus.cpuRead(operand);
+                byte high = cpu.bus.cpuRead(operand+1);
+                int ptr = ( (high << 8 ) + low ) + cpu.indexY;
+
+                cpu.accumulator = (byte) (cpu.accumulator ^ cpu.bus.cpuRead(ptr));
+                updateDEC_INC_EOR_Flags(cpu.accumulator);
+                printASM("EOR $"+ Integer.toHexString(operand) + " ,Y");
                 return (byte)cycle;
             }
         });
 
-        opcodes.put(0x59, new Opcode((byte)3){
+        opcodes.put(0x55, new Opcode((byte)4){
             @Override
             public byte execute(){
+                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
+                cpu.accumulator = (byte) (cpu.bus.cpuRead(  operand + cpu.indexX ) ^ cpu.accumulator) ;
+                updateDEC_INC_EOR_Flags(cpu.accumulator);
+                printASM("EOR $" + Integer.toHexString(operand + cpu.indexX ) + " ,X");
                 return (byte)cycle;
             }
         });
 
-        opcodes.put(0x5D, new Opcode((byte)3){
+        opcodes.put(0x59, new Opcode((byte)4){
             @Override
             public byte execute(){
+                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
+                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
+                cpu.accumulator = (byte) (cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexX) ^ cpu.accumulator) ;
+                updateDEC_INC_EOR_Flags( cpu.accumulator  );
+                printASM("EOC $" +  Integer.toHexString((operand1 << 8 ) + operand2) + ", X");
+                return (byte)cycle;
+            }
+        });
+
+        opcodes.put(0x5D, new Opcode((byte)4){
+            @Override
+            public byte execute(){
+                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
+                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
+                cpu.accumulator = (byte) (cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexY) ^ cpu.accumulator) ;
+                updateDEC_INC_EOR_Flags( cpu.accumulator  );
+                printASM("EOC $" +  Integer.toHexString((operand1 << 8 ) + operand2) + ", Y");
                 return (byte)cycle;
             }
         });

@@ -7,10 +7,14 @@ import com.nes8.components.processor.PPU;
  * the address written to 0x4014 to OAM
  */
 public class DMA {
-    // TODO: How long is DMA transfer supposed to take?
+    /*TODO: How long is DMA transfer supposed to take?
+    * Takes 513 - 514 cycles
+    * CPU is possibly forzen during this time
+    */
     public static void startDMATransfer(int address, RAM ram, PPU ppu){
         for(int i = 0; i < 256; ++i){
             ppu.oam.write(i , ram.read(address + i ));
         }
+        // TODO : Add sleep
     }
 }

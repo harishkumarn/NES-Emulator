@@ -49,6 +49,22 @@ public class PPU {
 
     public void write(int address, byte data){
         registers[address - 0x2000] = data;
+        switch(address ){
+            case 0x2000:// PPUCTRL
+            break;
+            case 0x2001:// PPUMASK
+            break;
+            case 0x2002:// PPUSTATUS
+            break;
+            case 0x2004:// OAMDATA
+            oam.write(registers[3], data);
+            break;
+            case 0x2005:// PPUSCROLL
+            break;
+            case 0x2007:// PPUDATA
+            nt.write(registers[6], data);
+            break;
+        }
     }
 
     private void cycle(int cycles) throws InterruptedException{

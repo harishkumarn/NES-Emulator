@@ -18,5 +18,16 @@ import com.nes8.Constants;
  */
 public class NameTable {
     public byte[] vram = new byte[2 * Constants.ONE_KB]; // 2 KB
+
+    // TODO: Handle horizontal, vertical mirroring
+    public void write(int address, byte value){
+        if(address >= 0x2000 && address <= 0x27FF){
+            vram[address - 0x2000] = value;
+        }
+    }
+
+    public byte read(int address){
+        return 0;
+    }
 }
 

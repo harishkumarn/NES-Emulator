@@ -60,7 +60,7 @@ public class Bus{
         else if((address >= 0x4000 && address <= 0x4013) || address == 0x4015 || address == 0x4017){
             apu.write(address, value);
         }else if(address == 0x4014){
-            DMA.startDMATransfer(address, ram, ppu);
+            DMA.startDMATransfer(value, ram, ppu);
         }
         else if(address == 0x4016 ){
             if(value == 1){
