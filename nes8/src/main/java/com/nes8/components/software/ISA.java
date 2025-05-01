@@ -10,6 +10,7 @@ import com.nes8.components.processor.CPU.Flag;
  * TODO: 
  * -> IRQ, NMI
  * -> Revisit all Flag register updations
+ * -> +1 cycle for indirect x,y, absolute x,y address modes i.e., page boundary penalty
 */
 public class ISA {
     HashMap<Integer, Opcode> opcodes  = new HashMap<Integer, Opcode>();
@@ -31,6 +32,7 @@ public class ISA {
         cpu.updateFlag(Flag.N, ((a + o + c) & 0x80) > 0 );
         cpu.updateFlag(Flag.V, ((~(a ^ o) & (a ^ (a + o + c))) & 0x0080)  > 0 );
     } 
+
     private void updateZNFlags(int val){
         cpu.updateFlag(Flag.Z, (val & 0xFF) == 0);
         cpu.updateFlag(Flag.N,  (val & 0x80) > 0 );
@@ -46,6 +48,115 @@ public class ISA {
         cpu.updateFlag(Flag.C, val >= 0);
         cpu.updateFlag(Flag.Z, (val & 0xFF) == 0);
         cpu.updateFlag(Flag.N,  (val & 0x80) > 0 );
+    }
+
+    private void SBC(byte value){
+        
+    }
+
+    private void LSR(int address){
+        int value = cpu.bus.cpuRead(address);
+        boolean carry =( value & 1) == 1;
+        value >>= 1;
+        byte result = (byte)( value & 0xff);
+        updateASFlags(result, carry);
+        cpu.bus.cpuWrite(address, result);
+    }
+
+    private void LDY(int address){
+        cpu.indexY = cpu.bus.cpuRead(address);
+        updateZNFlags(cpu.indexY);
+    }
+
+    private void LDX(int address){
+        cpu.indexX = cpu.bus.cpuRead(address);
+        updateZNFlags(cpu.indexX);
+    }
+
+    private void LDA(int address){
+        cpu.accumulator = cpu.bus.cpuRead(address);
+        updateZNFlags(cpu.accumulator);
+    }
+
+    private void INC(int address){
+        byte val = (byte) (cpu.bus.cpuRead( address) + 1) ;
+        updateZNFlags( val  );
+        cpu.bus.cpuWrite(address, val);
+    }
+
+    private void CMP(int address){
+        int temp = cpu.accumulator - cpu.bus.cpuRead(address );
+        updateCMPFlags(temp);
+    }
+
+    private void CPY(int address){
+        int temp = cpu.indexY - cpu.bus.cpuRead( address) ;
+        updateCMPFlags(temp);
+    }
+
+    private void DEC(int address){
+        byte val = (byte) (cpu.bus.cpuRead(address) - 1) ;
+        updateZNFlags( val  );
+        cpu.bus.cpuWrite( address, val);
+    }
+
+    private void EOR(int address){
+        cpu.accumulator = (byte) (cpu.bus.cpuRead(address) ^ cpu.accumulator) ;
+        updateZNFlags( cpu.accumulator  );
+    }
+
+    private void AND(int address){
+        int temp = cpu.accumulator & cpu.bus.cpuRead(address ) ;
+        updateZNFlags(temp);
+        cpu.accumulator = (byte)(temp & 0xFF);
+    }
+
+    private void ADC(int address){
+        int temp = cpu.accumulator + cpu.bus.cpuRead(address ) +  cpu.getFlag(Flag.C);
+        updateADCFlags(cpu.accumulator,cpu.bus.cpuRead(address ) , cpu.getFlag(Flag.C));
+        cpu.accumulator = (byte)(temp & 0xFF);
+    }
+
+    private void ASL(int address){
+        int value = cpu.bus.cpuRead(address);
+        boolean carry =( value & 0x80) == 0x80;
+        value <<= 1;
+        byte result = (byte)( value & 0xff);
+        updateASFlags(result, carry);
+        cpu.bus.cpuWrite(address, result);
+    }
+
+    private void BIT(int address){
+        byte m = cpu.bus.cpuRead(address);
+        cpu.updateFlag(Flag.N, ( m & 0x80) > 0 );
+        cpu.updateFlag(Flag.V, ( m & 0x40) > 0);
+        cpu.updateFlag(Flag.Z, ( (cpu.accumulator & m ) & 0xFF )  == 0);
+    }
+
+    private void CPX(int address){
+        int temp = cpu.indexX - cpu.bus.cpuRead( address) ;
+        updateCMPFlags(temp);
+    }
+    private void ROR(int address){
+        byte value = cpu.bus.cpuRead(address);
+        boolean carry = ( value & 1 ) == 1;
+        int result = ((value >> 1) | (cpu.getFlag(Flag.C) << 8) ) & 0xFF;
+        updateASFlags(cpu.accumulator, carry);
+        cpu.bus.cpuWrite(address, (byte)result);
+    }
+
+    private void ROL(int address){
+        byte value = cpu.bus.cpuRead(address);
+        boolean carry = ( value& 0x80 ) == 0x80;
+        int result = ((value << 1) | cpu.getFlag(Flag.C) ) & 0xFF;
+        updateASFlags(cpu.accumulator, carry);
+        cpu.bus.cpuWrite(address, (byte)result);
+    }
+
+    private void ORA(int address){
+        byte value = cpu.bus.cpuRead(address);
+        cpu.accumulator |= value;
+        updateZNFlags(cpu.accumulator);
     }
 
     //----------------------
@@ -66,9 +177,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getZeroPage();
-                int temp = cpu.accumulator + cpu.bus.cpuRead(address) +  cpu.getFlag(Flag.C);
-                updateADCFlags(cpu.accumulator,cpu.bus.cpuRead(address), cpu.getFlag(Flag.C));
-                cpu.accumulator = (byte)(temp & 0xFF);
+                ADC(address);
                 printASM("ADC Z "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -77,9 +186,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getZeroPageX();
-                int temp = cpu.accumulator + cpu.bus.cpuRead(address ) +  cpu.getFlag(Flag.C);
-                updateADCFlags(cpu.accumulator, cpu.bus.cpuRead(address), cpu.getFlag(Flag.C));
-                cpu.accumulator = (byte)(temp & 0xFF);
+                ADC(address);
                 printASM("ADC Zx "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -88,9 +195,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getAbsolute();
-                int temp = cpu.accumulator + cpu.bus.cpuRead(address) +  cpu.getFlag(Flag.C);
-                updateADCFlags(cpu.accumulator,cpu.bus.cpuRead( address) , cpu.getFlag(Flag.C));
-                cpu.accumulator = (byte)(temp & 0xFF);
+                ADC(address);
                 printASM("ADC A "+ Integer.toHexString(address) );
                 return (byte)cycle;
             }
@@ -99,9 +204,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getAbsoluteX();
-                int temp = cpu.accumulator + cpu.bus.cpuRead( address) +  cpu.getFlag(Flag.C);
-                updateADCFlags(cpu.accumulator, cpu.bus.cpuRead(address), cpu.getFlag(Flag.C));
-                cpu.accumulator = (byte)(temp & 0xFF);
+                ADC(address);
                 printASM("ADC Ax "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -110,9 +213,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getAbsoluteY();
-                int temp = cpu.accumulator + cpu.bus.cpuRead( address) +  cpu.getFlag(Flag.C);
-                updateADCFlags(cpu.accumulator,cpu.bus.cpuRead(address)  , cpu.getFlag(Flag.C));
-                cpu.accumulator = (byte)(temp & 0xFF);
+                ADC(address);
                 printASM("ADC Ay "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -121,9 +222,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getIndirectX();
-                int temp = cpu.accumulator + cpu.bus.cpuRead(address ) +  cpu.getFlag(Flag.C);
-                updateADCFlags(cpu.accumulator, cpu.bus.cpuRead(address ), cpu.getFlag(Flag.C));
-                cpu.accumulator = (byte)(temp & 0xFF);
+                ADC(address);
                 printASM("ADC Ix "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -132,9 +231,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getIndirectY();
-                int temp = cpu.accumulator + cpu.bus.cpuRead(address ) +  cpu.getFlag(Flag.C);
-                updateADCFlags(cpu.accumulator,cpu.bus.cpuRead(address ) , cpu.getFlag(Flag.C));
-                cpu.accumulator = (byte)(temp & 0xFF);
+                ADC(address);
                 printASM("ADC Iy "+ Integer.toHexString(address) );
                 return (byte)cycle;
             }
@@ -158,9 +255,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getZeroPage();
-                int temp = cpu.accumulator & cpu.bus.cpuRead(address);
-                updateZNFlags(temp);
-                cpu.accumulator = (byte)(temp & 0xFF);
+                AND(address);
                 printASM("AND Z "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -169,9 +264,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getZeroPageX();
-                int temp = cpu.accumulator & cpu.bus.cpuRead(address);
-                updateZNFlags(temp);
-                cpu.accumulator = (byte)(temp & 0xFF);
+                AND(address);
                 printASM("AND Zx "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -180,9 +273,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getAbsolute();
-                int temp = cpu.accumulator & cpu.bus.cpuRead(address) ;
-                updateZNFlags(temp);
-                cpu.accumulator = (byte)(temp & 0xFF);
+                AND(address);
                 printASM("AND A "+ Integer.toHexString(address ));
                 return (byte)cycle;
             }
@@ -191,9 +282,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getAbsoluteX();
-                int temp = cpu.accumulator & cpu.bus.cpuRead(address) ;
-                updateZNFlags(temp);
-                cpu.accumulator = (byte)(temp & 0xFF);
+                AND(address);
                 printASM("AND Ax "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -202,9 +291,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getAbsoluteY();
-                int temp = cpu.accumulator & cpu.bus.cpuRead(address) ;
-                updateZNFlags(temp);
-                cpu.accumulator = (byte)(temp & 0xFF);
+                AND(address);
                 printASM("AND Ay "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -213,9 +300,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getIndirectX();
-                int temp = cpu.accumulator & cpu.bus.cpuRead(address ) ;
-                updateZNFlags(temp);
-                cpu.accumulator = (byte)(temp & 0xFF);
+                AND(address);
                 printASM("AND Ix "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -224,9 +309,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getIndirectY();
-                int temp = cpu.accumulator & cpu.bus.cpuRead(address ) ;
-                updateZNFlags(temp);
-                cpu.accumulator = (byte)(temp & 0xFF);
+                AND(address);
                 printASM("AND Iy "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -250,12 +333,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getZeroPage();
-                int value = cpu.bus.cpuRead(address);
-                boolean carry =( value & 0x80) == 0x80;
-                value <<= 1;
-                byte result = (byte)( value & 0xff);
-                updateASFlags(result, carry);
-                cpu.bus.cpuWrite(address, result);
+                ASL(address);
                 printASM("ASL Z "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -264,12 +342,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getZeroPageX();
-                int value = cpu.bus.cpuRead(address);
-                boolean carry =( value & 0x80) == 0x80;
-                value <<= 1;
-                byte result = (byte)( value & 0xff);
-                updateASFlags(result, carry);
-                cpu.bus.cpuWrite(address, result);
+                ASL(address);
                 printASM("ASL Zx "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -278,12 +351,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getAbsolute();
-                int value = cpu.bus.cpuRead(address);
-                boolean carry =( value & 0x80) == 0x80;
-                value <<= 1;
-                byte result = (byte)( value & 0xff);
-                updateASFlags(result, carry);
-                cpu.bus.cpuWrite(address, result);
+                ASL(address);
                 printASM("ASL A "+ Integer.toHexString(address) );
                 return (byte)cycle;
             }
@@ -292,12 +360,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getAbsoluteX();
-                int value = cpu.bus.cpuRead(address);
-                boolean carry =( value & 0x80) == 0x80;
-                value <<= 1;
-                byte result = (byte)( value & 0xff);
-                updateASFlags(result, carry);
-                cpu.bus.cpuWrite(address, result);
+                ASL(address);
                 printASM("ASL Ax "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -517,10 +580,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getZeroPage();
-                byte m = cpu.bus.cpuRead(address);
-                cpu.updateFlag(Flag.N, ( m & 0x80) > 0 );
-                cpu.updateFlag(Flag.V, ( m & 0x40) > 0);
-                cpu.updateFlag(Flag.Z, ( (cpu.accumulator & m ) & 0xFF )  == 0);
+                BIT(address);
                 printASM("BIT Z " + Integer.toHexString(address) );
                 return (byte)cycle;
             }
@@ -530,10 +590,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getAbsolute();
-                byte m = cpu.bus.cpuRead(address);
-                cpu.updateFlag(Flag.N, ( m & 0x80) > 0 );
-                cpu.updateFlag(Flag.V, ( m & 0x40) > 0);
-                cpu.updateFlag(Flag.Z, ( (cpu.accumulator & m ) & 0xFF )  == 0);
+                BIT(address);
                 printASM("BIT A " + Integer.toHexString(address ));
                 return (byte)cycle;
             }
@@ -556,8 +613,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getZeroPage();
-                int temp = cpu.accumulator - cpu.bus.cpuRead(address) ;
-                updateCMPFlags(temp);
+                CMP(address);
                 printASM("CMP Z "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -566,8 +622,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getZeroPageX();
-                int temp = cpu.accumulator - cpu.bus.cpuRead(address) ;
-                updateCMPFlags(temp);
+                CMP(address);
                 printASM("CMP Zx "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -576,8 +631,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getAbsolute();
-                int temp = cpu.accumulator - cpu.bus.cpuRead(address) ;
-                updateCMPFlags(temp);
+                CMP(address);
                 printASM("CMP A "+ Integer.toHexString(address ));
                 return (byte)cycle;
             }
@@ -586,8 +640,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getAbsoluteX();
-                int temp = cpu.accumulator - cpu.bus.cpuRead( address);
-                updateCMPFlags(temp);
+                CMP(address);
                 printASM("CMP Ax "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -596,8 +649,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getAbsoluteY();
-                int temp = cpu.accumulator - cpu.bus.cpuRead( address) ;
-                updateCMPFlags(temp);
+                CMP(address);
                 printASM("CMP Ay "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -606,8 +658,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getIndirectX();
-                int temp = cpu.accumulator - cpu.bus.cpuRead(address );
-                updateCMPFlags(temp);
+                CMP(address);
                 printASM("CMP Ix "+ Integer.toHexString(address) );
                 return (byte)cycle;
             }
@@ -616,8 +667,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getIndirectY();
-                int temp = cpu.accumulator - cpu.bus.cpuRead(address );
-                updateCMPFlags(temp);
+                CMP(address);
                 printASM("CMP Iy "+ Integer.toHexString(address) );
                 return (byte)cycle;
             }
@@ -640,8 +690,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getZeroPage();
-                int temp = cpu.indexX - cpu.bus.cpuRead(address) ;
-                updateCMPFlags(temp);
+                CPX(address);
                 printASM("CPX Z "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -651,8 +700,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getAbsolute();
-                int temp = cpu.indexX - cpu.bus.cpuRead( address) ;
-                updateCMPFlags(temp);
+                CPX(address);
                 printASM("CPX A "+ Integer.toHexString(address ));
                 return (byte)cycle;
             }
@@ -676,8 +724,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getZeroPage();
-                int temp = cpu.indexY - cpu.bus.cpuRead(address) ;
-                updateCMPFlags(temp);
+                CPY(address);
                 printASM("CPY Z "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -687,8 +734,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getAbsolute();
-                int temp = cpu.indexY - cpu.bus.cpuRead( address) ;
-                updateCMPFlags(temp);
+                CPY(address);
                 printASM("CPY A "+ Integer.toHexString(address) );
                 return (byte)cycle;
             }
@@ -711,9 +757,7 @@ public class ISA {
             @Override
             public byte execute(){
                 byte address = cpu.getZeroPage();
-                byte val = (byte) (cpu.bus.cpuRead( address) - 1);
-                updateZNFlags( val  );
-                cpu.bus.cpuWrite(address, val);
+                DEC(address);
                 printASM("DEC Z " + Integer.toHexString(address)); 
                 return (byte)cycle;
             }
@@ -723,9 +767,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getZeroPageX();
-                byte val = (byte) (cpu.bus.cpuRead( address) - 1); 
-                updateZNFlags( val  );
-                cpu.bus.cpuWrite(  address, val);
+                DEC(address);
                 printASM("DEC Zx " +  Integer.toHexString(address) );
                 return (byte)cycle;
             }
@@ -735,9 +777,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getAbsolute();
-                byte val = (byte) (cpu.bus.cpuRead(address ) - 1);
-                updateZNFlags( val  );
-                cpu.bus.cpuWrite( address , val);
+                DEC(address);
                 printASM("DEC A " +  Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -747,9 +787,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getAbsoluteX();
-                byte val = (byte) (cpu.bus.cpuRead(address) - 1) ;
-                updateZNFlags( val  );
-                cpu.bus.cpuWrite( address, val);
+                DEC(address);
                 printASM("DEC Ax " +  Integer.toHexString(address ));
                 return (byte)cycle;
             }
@@ -810,9 +848,7 @@ public class ISA {
             @Override
             public byte execute(){
                 byte address = cpu.getZeroPage();
-                byte val = (byte) (cpu.bus.cpuRead( address) + 1);
-                updateZNFlags( val  );
-                cpu.bus.cpuWrite(address, val);
+                INC(address);
                 printASM("INC Z " + Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -822,9 +858,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getZeroPageX();
-                byte val = (byte) (cpu.bus.cpuRead(address) + 1); 
-                updateZNFlags( val  );
-                cpu.bus.cpuWrite( address, val);
+                INC(address);
                 printASM("INC Zx " +  Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -834,9 +868,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getAbsolute();
-                byte val = (byte) (cpu.bus.cpuRead(address ) + 1);
-                updateZNFlags( val  );
-                cpu.bus.cpuWrite( address , val);
+                INC(address);
                 printASM("INC A " +  Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -846,9 +878,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getAbsoluteX();
-                byte val = (byte) (cpu.bus.cpuRead( address) + 1) ;
-                updateZNFlags( val  );
-                cpu.bus.cpuWrite(address, val);
+                INC(address);
                 printASM("INC Ax " +  Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -859,10 +889,9 @@ public class ISA {
         opcodes.put(0x41, new Opcode((byte)6){
             @Override
             public byte execute(){
-                int ptr = cpu.getIndirectX();
-                cpu.accumulator = (byte) (cpu.accumulator ^ cpu.bus.cpuRead(ptr));
-                updateZNFlags(cpu.accumulator);
-                printASM("EOR Ix "+ Integer.toHexString(ptr));
+                int address = cpu.getIndirectX();
+                EOR(address);
+                printASM("EOR Ix "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -870,10 +899,9 @@ public class ISA {
         opcodes.put(0x45, new Opcode((byte)3){
             @Override
             public byte execute(){
-                byte operand = cpu.getZeroPage();
-                cpu.accumulator = (byte) (cpu.bus.cpuRead(operand) ^ cpu.accumulator);
-                updateZNFlags(cpu.accumulator);
-                printASM("EOR Z " + Integer.toHexString(operand));
+                byte address = cpu.getZeroPage();
+                EOR(address);
+                printASM("EOR Z " + Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -893,8 +921,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getAbsolute();
-                cpu.accumulator = (byte) (cpu.bus.cpuRead( address ) ^ cpu.accumulator) ;
-                updateZNFlags(cpu.accumulator);
+                EOR(address);
                 printASM("EOR A " + Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -903,11 +930,9 @@ public class ISA {
         opcodes.put(0x51, new Opcode((byte)5){
             @Override
             public byte execute(){
-                int ptr = cpu.getIndirectY();
-
-                cpu.accumulator = (byte) (cpu.accumulator ^ cpu.bus.cpuRead(ptr));
-                updateZNFlags(cpu.accumulator);
-                printASM("EOR Iy "+ Integer.toHexString(ptr));
+                int address = cpu.getIndirectY();
+                EOR(address);
+                printASM("EOR Iy "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -916,8 +941,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getZeroPageX();
-                cpu.accumulator = (byte) (cpu.bus.cpuRead(  address ) ^ cpu.accumulator) ;
-                updateZNFlags(cpu.accumulator);
+                EOR(address);
                 printASM("EOR Zx " + Integer.toHexString(address ));
                 return (byte)cycle;
             }
@@ -927,8 +951,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getAbsoluteY();
-                cpu.accumulator = (byte) (cpu.bus.cpuRead(address) ^ cpu.accumulator) ;
-                updateZNFlags( cpu.accumulator  );
+                EOR(address);
                 printASM("EOR Ay " +  Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -938,8 +961,7 @@ public class ISA {
             @Override
             public byte execute(){
                 int address = cpu.getAbsoluteX();
-                cpu.accumulator = (byte) (cpu.bus.cpuRead(address) ^ cpu.accumulator) ;
-                updateZNFlags( cpu.accumulator  );
+                EOR(address);
                 printASM("EOR Ax " +  Integer.toHexString(address));
                 return (byte)cycle;
             }
@@ -1156,8 +1178,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getZeroPage();
-            cpu.accumulator = cpu.bus.cpuRead(address);
-            updateZNFlags(cpu.accumulator);
+            LDA(address);
             printASM("LDA Z "+Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1167,8 +1188,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getZeroPageX();
-            cpu.accumulator = cpu.bus.cpuRead(address);
-            updateZNFlags(cpu.accumulator);
+            LDA(address);
             printASM("LDA Zx "+Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1178,8 +1198,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getAbsolute();
-            cpu.accumulator = cpu.bus.cpuRead(address);
-            updateZNFlags(cpu.accumulator);
+            LDA(address);
             printASM("LDA A "+Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1189,8 +1208,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getAbsoluteX();
-            cpu.accumulator = cpu.bus.cpuRead(address);
-            updateZNFlags(cpu.accumulator);
+            LDA(address);
             printASM("LDA Ax "+Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1200,8 +1218,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getAbsoluteY();
-            cpu.accumulator = cpu.bus.cpuRead(address);
-            updateZNFlags(cpu.accumulator);
+            LDA(address);
             printASM("LDA Ay "+Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1211,8 +1228,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getIndirectX();
-            cpu.accumulator = cpu.bus.cpuRead(address);
-            updateZNFlags(cpu.accumulator);
+            LDA(address);
             printASM("LDA Ix "+Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1222,8 +1238,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getIndirectY();
-            cpu.accumulator = cpu.bus.cpuRead(address);
-            updateZNFlags(cpu.accumulator);
+            LDA(address);
             printASM("LDA Iy "+Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1246,8 +1261,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getZeroPage();
-            cpu.indexX = cpu.bus.cpuRead(address);
-            updateZNFlags(cpu.indexX);
+            LDX(address);
             printASM("LDX Z "+Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1257,8 +1271,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getZeroPageY();
-            cpu.indexX = cpu.bus.cpuRead(address);
-            updateZNFlags(cpu.indexX);
+            LDX(address);
             printASM("LDX Zy "+Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1268,8 +1281,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getAbsolute();
-            cpu.indexX = cpu.bus.cpuRead(address);
-            updateZNFlags(cpu.indexX);
+            LDX(address);
             printASM("LDX A "+Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1279,8 +1291,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getAbsoluteY();
-            cpu.indexX = cpu.bus.cpuRead(address);
-            updateZNFlags(cpu.indexX);
+            LDX(address);
             printASM("LDX Ay "+Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1303,8 +1314,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getZeroPage();
-            cpu.indexY = cpu.bus.cpuRead(address);
-            updateZNFlags(cpu.indexY);
+            LDY(address);
             printASM("LDY Z "+Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1314,8 +1324,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getZeroPageX();
-            cpu.indexY = cpu.bus.cpuRead(address);
-            updateZNFlags(cpu.indexY);
+            LDY(address);
             printASM("LDY Zx "+Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1325,8 +1334,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getAbsolute();
-            cpu.indexY = cpu.bus.cpuRead(address);
-            updateZNFlags(cpu.indexY);
+            LDY(address);
             printASM("LDY A "+Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1336,8 +1344,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getAbsoluteX();
-            cpu.indexY = cpu.bus.cpuRead(address);
-            updateZNFlags(cpu.indexY);
+            LDY(address);
             printASM("LDY Ax "+Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1363,12 +1370,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getZeroPage();
-            int value = cpu.bus.cpuRead(address);
-            boolean carry =( value & 1) == 1;
-            value >>= 1;
-            byte result = (byte)( value & 0xff);
-            updateASFlags(result, carry);
-            cpu.bus.cpuWrite(address, result);
+            LSR(address);
             printASM("LSR Z " +  Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1377,12 +1379,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getZeroPageX();
-            int value = cpu.bus.cpuRead(address);
-            boolean carry =( value & 1) == 1;
-            value >>= 1;
-            byte result = (byte)( value & 0xff);
-            updateASFlags(result, carry);
-            cpu.bus.cpuWrite(address, result);
+            LSR(address);
             printASM("LSR Zx" + Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1391,12 +1388,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getAbsolute();
-            int value = cpu.bus.cpuRead(address);
-            boolean carry =( value & 1) == 1;
-            value >>= 1;
-            byte result = (byte)( value & 0xff);
-            updateASFlags(result, carry);
-            cpu.bus.cpuWrite(address, result);
+            LSR(address);
             printASM("LSR A" + Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1405,12 +1397,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getAbsoluteX();
-            int value = cpu.bus.cpuRead(address);
-            boolean carry =( value & 1) == 1;
-            value >>= 1;
-            byte result = (byte)( value & 0xff);
-            updateASFlags(result, carry);
-            cpu.bus.cpuWrite(address, result);
+            LSR(address);
             printASM("LSR Ax" + Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1431,9 +1418,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getZeroPage();
-            byte value = cpu.bus.cpuRead(address);
-            cpu.accumulator |= value;
-            updateZNFlags(cpu.accumulator);
+            ORA(address);
             printASM("ORA Z " + Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1442,9 +1427,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getZeroPageX();
-            byte value = cpu.bus.cpuRead(address);
-            cpu.accumulator |= value;
-            updateZNFlags(cpu.accumulator);
+            ORA(address);
             printASM("ORA Zx " + Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1453,9 +1436,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getAbsolute();
-            byte value = cpu.bus.cpuRead(address);
-            cpu.accumulator |= value;
-            updateZNFlags(cpu.accumulator);
+            ORA(address);
             printASM("ORA A " + Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1464,9 +1445,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getAbsoluteX();
-            byte value = cpu.bus.cpuRead(address);
-            cpu.accumulator |= value;
-            updateZNFlags(cpu.accumulator);
+            ORA(address);
             printASM("ORA Ax " + Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1475,9 +1454,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getAbsoluteY();
-            byte value = cpu.bus.cpuRead(address);
-            cpu.accumulator |= value;
-            updateZNFlags(cpu.accumulator);
+            ORA(address);
             printASM("ORA Ay " + Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1486,9 +1463,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getIndirectX();
-            byte value = cpu.bus.cpuRead(address);
-            cpu.accumulator |= value;
-            updateZNFlags(cpu.accumulator);
+            ORA(address);
             printASM("ORA Ix " + Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1497,9 +1472,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getIndirectY();
-            byte value = cpu.bus.cpuRead(address);
-            cpu.accumulator |= value;
-            updateZNFlags(cpu.accumulator);
+            ORA(address);
             printASM("ORA Iy " + Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1565,11 +1538,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getZeroPage();
-            byte value = cpu.bus.cpuRead(address);
-            boolean carry = ( value& 0x80 ) == 0x80;
-            int result = ((value << 1) | cpu.getFlag(Flag.C) ) & 0xFF;
-            updateASFlags(cpu.accumulator, carry);
-            cpu.bus.cpuWrite(address, (byte)result);
+            ROL(address);
             printASM("ROL Z " + Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1578,11 +1547,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getZeroPageX();
-            byte value = cpu.bus.cpuRead(address);
-            boolean carry = ( value& 0x80 ) == 0x80;
-            int result = ((value << 1) | cpu.getFlag(Flag.C) ) & 0xFF;
-            updateASFlags(cpu.accumulator, carry);
-            cpu.bus.cpuWrite(address, (byte)result);
+            ROL(address);
             printASM("ROL Zx " + Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1591,24 +1556,17 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getAbsolute();
-            byte value = cpu.bus.cpuRead(address);
-            boolean carry = ( value& 0x80 ) == 0x80;
-            int result = ((value << 1) | cpu.getFlag(Flag.C) ) & 0xFF;
-            updateASFlags(cpu.accumulator, carry);
-            cpu.bus.cpuWrite(address, (byte)result);
+            ROL(address);
             printASM("ROL A " + Integer.toHexString(address));
             return (byte)cycle;
         }
+
     });
     opcodes.put(0x3E, new Opcode((byte)7) {
         @Override
         public byte execute(){
             int address = cpu.getAbsoluteX();
-            byte value = cpu.bus.cpuRead(address);
-            boolean carry = ( value& 0x80 ) == 0x80;
-            int result = ((value << 1) | cpu.getFlag(Flag.C) ) & 0xFF;
-            updateASFlags(cpu.accumulator, carry);
-            cpu.bus.cpuWrite(address, (byte)result);
+            ROL(address);
             printASM("ROL Ax " + Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1630,11 +1588,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getZeroPage();
-            byte value = cpu.bus.cpuRead(address);
-            boolean carry = ( value & 1 ) == 1;
-            int result = ((value >> 1) | (cpu.getFlag(Flag.C) << 8) ) & 0xFF;
-            updateASFlags(cpu.accumulator, carry);
-            cpu.bus.cpuWrite(address, (byte)result);
+            ROR(address);
             printASM("ROR Z " + Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1643,11 +1597,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getZeroPageX();
-            byte value = cpu.bus.cpuRead(address);
-            boolean carry = ( value & 1 ) == 1;
-            int result = ((value >> 1) | (cpu.getFlag(Flag.C) << 8) ) & 0xFF;
-            updateASFlags(cpu.accumulator, carry);
-            cpu.bus.cpuWrite(address, (byte)result);
+            ROR(address);
             printASM("ROR Zx " + Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1656,11 +1606,7 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getAbsolute();
-            byte value = cpu.bus.cpuRead(address);
-            boolean carry = ( value & 1 ) == 1;
-            int result = ((value >> 1) | (cpu.getFlag(Flag.C) << 8) ) & 0xFF;
-            updateASFlags(cpu.accumulator, carry);
-            cpu.bus.cpuWrite(address, (byte)result);
+            ROR(address);
             printASM("ROR A " + Integer.toHexString(address));
             return (byte)cycle;
         }
@@ -1669,17 +1615,86 @@ public class ISA {
         @Override
         public byte execute(){
             int address = cpu.getAbsoluteX();
-            byte value = cpu.bus.cpuRead(address);
-            boolean carry = ( value & 1 ) == 1;
-            int result = ((value >> 1) | (cpu.getFlag(Flag.C) << 8) ) & 0xFF;
-            updateASFlags(cpu.accumulator, carry);
-            cpu.bus.cpuWrite(address, (byte)result);
+            ROR(address);
             printASM("ROR Ax " + Integer.toHexString(address));
             return (byte)cycle;
         }
     });
-
-    //SBC, SEC, SED, SEI, 
+    //-----------------
+    //SBC
+    opcodes.put(0xE9, new Opcode((byte)2) {
+        @Override
+        public byte execute(){
+            byte value = cpu.bus.cpuRead(cpu.programCounter++);
+            SBC(value);
+            printASM("SBC " + Integer.toHexString(value));
+            return (byte)cycle;
+        }
+    });
+    opcodes.put(0xE5, new Opcode((byte)3) {
+        @Override
+        public byte execute(){
+            int address = cpu.getZeroPage();
+            SBC(cpu.bus.cpuRead(address));
+            printASM("SBC Z " + Integer.toHexString(address));
+            return (byte)cycle;
+        }
+    });
+    opcodes.put(0xF5, new Opcode((byte)4) {
+        @Override
+        public byte execute(){
+            int address = cpu.getZeroPageX();
+            SBC(cpu.bus.cpuRead(address));
+            printASM("SBC Zx " + Integer.toHexString(address));
+            return (byte)cycle;
+        }
+    });
+    opcodes.put(0xED, new Opcode((byte)4) {
+        @Override
+        public byte execute(){
+            int address = cpu.getIndirect();
+            SBC(cpu.bus.cpuRead(address));
+            printASM("SBC A " + Integer.toHexString(address));
+            return (byte)cycle;
+        }
+    });
+    opcodes.put(0xFD, new Opcode((byte)4) {
+        @Override
+        public byte execute(){
+            int address = cpu.getAbsoluteX();
+            SBC(cpu.bus.cpuRead(address));
+            printASM("SBC Ax " + Integer.toHexString(address));
+            return (byte)cycle;
+        }
+    });
+    opcodes.put(0xF9, new Opcode((byte)4) {
+        @Override
+        public byte execute(){
+            int address = cpu.getAbsoluteY();
+            SBC(cpu.bus.cpuRead(address));
+            printASM("SBC Ay " + Integer.toHexString(address));
+            return (byte)cycle;
+        }
+    });
+    opcodes.put(0xE1, new Opcode((byte)6) {
+        @Override
+        public byte execute(){
+            int address = cpu.getIndirectX();
+            SBC(cpu.bus.cpuRead(address));
+            printASM("SBC Ix " + Integer.toHexString(address));
+            return (byte)cycle;
+        }
+    });
+    opcodes.put(0xF1, new Opcode((byte)5) {
+        @Override
+        public byte execute(){
+            int address = cpu.getIndirectY();
+            SBC(cpu.bus.cpuRead(address));
+            printASM("SBC Iy " + Integer.toHexString(address));
+            return (byte)cycle;
+        }
+    });
+    //SEC, SED, SEI, 
     //TAX, TAY, TSX, TXA, TXS, TYA
     }
 }
