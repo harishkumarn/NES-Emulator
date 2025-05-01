@@ -17,7 +17,7 @@ import com.nes8.components.bus.Bus;
 public class CPU{
     // Registers
     public int programCounter =  0x8000;
-    public byte stackPointer = 0 ; 
+    public byte stackPointer = (byte)0xFD; 
     public byte statusRegister = 0;
     public byte indexX = 0;
     public byte indexY = 0;
@@ -47,7 +47,6 @@ public class CPU{
     public Bus bus;
     DMA dma = new DMA();
     ObjectAttributeMemory oam = new ObjectAttributeMemory();
-    public Stack<Byte> stack = new Stack<Byte>();
     ISA isa = new ISA(this);
 
 
@@ -88,11 +87,19 @@ public class CPU{
         return (byte) ((this.statusRegister & flag.index) > 0 ? 1 : 0) ;
     }
 
+    public void stackPush(byte value){
+        bus.cpuWrite(0x100 + stackPointer--, value);
+    }
+
+    public byte stackPop(){
+        return bus.cpuRead(0x100 + stackPointer++);
+    }
+
     public void pushAddressToStack(int address){
         byte high = (byte)((address >> 8 ) & 0xFF);
-        stack.push(high);
+        stackPush(high);
         byte low = (byte)(address & 0xFF);
-        stack.push(low);
+        stackPush(low);
     }
 
     // Addressing modes of 6502

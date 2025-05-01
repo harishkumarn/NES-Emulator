@@ -574,7 +574,7 @@ public class ISA {
                 cpu.programCounter ++;
                 cpu.pushAddressToStack(cpu.programCounter);
                 cpu.updateFlag(Flag.I, true);
-                cpu.stack.push(cpu.statusRegister );
+                cpu.stackPush(cpu.statusRegister );
                 cpu.updateFlag(Flag.I, false);// ?? is this needed
 
                 cpu.programCounter = (short)((cpu.bus.cpuRead(0xFFFF) << 8 ) | (cpu.bus.cpuRead(0xFFFE)));
@@ -1013,8 +1013,8 @@ public class ISA {
     opcodes.put(0x60, new Opcode((byte)6){
         @Override
         public byte execute(){
-            byte low = cpu.stack.pop();
-            byte high = cpu.stack.pop();
+            byte low = cpu.stackPop();
+            byte high = cpu.stackPop();
             cpu.programCounter = ((high << 8 ) + low) + 1;
             printASM("RTS");
             return (byte)cycle;
@@ -1026,9 +1026,9 @@ public class ISA {
     opcodes.put(0x40, new Opcode((byte)6){
         @Override
         public byte execute(){
-            cpu.statusRegister = cpu.stack.pop();
-            byte low = cpu.stack.pop();
-            byte high = cpu.stack.pop();
+            cpu.statusRegister = cpu.stackPop();
+            byte low = cpu.stackPop();
+            byte high = cpu.stackPop();
             cpu.programCounter = (high << 8) + low;
             printASM("RTI");
             return (byte)cycle;
@@ -1491,7 +1491,7 @@ public class ISA {
     opcodes.put(0x48, new Opcode((byte)3) {
         @Override
         public byte execute(){
-            cpu.stack.push(cpu.accumulator);
+            cpu.stackPush(cpu.accumulator);
             printASM("PHA");
             return (byte)cycle;
         }
@@ -1501,7 +1501,7 @@ public class ISA {
     opcodes.put(0x08, new Opcode((byte)3) {
         @Override
         public byte execute(){
-            cpu.stack.push((byte)(cpu.statusRegister | 0x30));
+            cpu.stackPush((byte)(cpu.statusRegister | 0x30));
             printASM("PHP");
             return (byte)cycle;
         }
@@ -1511,7 +1511,7 @@ public class ISA {
     opcodes.put(0x68, new Opcode((byte)4) {
         @Override
         public byte execute(){
-            cpu.accumulator = cpu.stack.pop(); 
+            cpu.accumulator = cpu.stackPop(); 
             updateZNFlags(cpu.accumulator);
             printASM("PLA");
             return (byte)cycle;
@@ -1522,7 +1522,7 @@ public class ISA {
     opcodes.put(0x28, new Opcode((byte)4) {
         @Override
         public byte execute(){
-            cpu.statusRegister = cpu.stack.pop(); 
+            cpu.statusRegister = cpu.stackPop(); 
             cpu.updateFlag(Flag.D, true);
             cpu.updateFlag(Flag.B, false);
             updateZNFlags(cpu.statusRegister);
@@ -1735,7 +1735,70 @@ public class ISA {
     }); 
     //--------------------
     //TAX
+    opcodes.put(0xAA, new Opcode((byte)2) {
+        @Override
+        public byte execute(){
+            cpu.indexX = cpu.accumulator;
+            updateZNFlags(cpu.indexX);
+            printASM("TAX");
+            return (byte)cycle;
+        }
+    });     
+    //-------------------
+    //TAY
+    opcodes.put(0xA8, new Opcode((byte)2) {
+        @Override
+        public byte execute(){
+            cpu.indexY = cpu.accumulator;
+            updateZNFlags(cpu.indexY);
+            printASM("TAY");
+            return (byte)cycle;
+        }
+    }); 
+    //-------------------
+    //TSX
+    opcodes.put(0xBA, new Opcode((byte)2) {
+        @Override
+        public byte execute(){
+            cpu.indexX = cpu.stackPointer;
+            updateZNFlags(cpu.indexX);
+            printASM("TSX");
+            return (byte)cycle;
+        }
+    }); 
+    //-------------------
+    //TXA
+    opcodes.put(0x8A, new Opcode((byte)2) {
+        @Override
+        public byte execute(){
+            cpu.accumulator = cpu.indexX;
+            updateZNFlags(cpu.accumulator);
+            printASM("TXA");
+            return (byte)cycle;
+        }
+    }); 
 
-    //TAY, TSX, TXA, TXS, TYA
+    //-------------------
+    //TXS
+    opcodes.put(0x9A, new Opcode((byte)2) {
+        @Override
+        public byte execute(){
+            cpu.stackPointer = cpu.indexX;
+            printASM("TXS");
+            return (byte)cycle;
+        }
+    }); 
+
+    //-------------------
+    //TYA
+    opcodes.put(0x98, new Opcode((byte)2) {
+        @Override
+        public byte execute(){
+            cpu.accumulator = cpu.indexY;
+            updateZNFlags(cpu.accumulator);
+            printASM("TYA");
+            return (byte)cycle;
+        }
+    }); 
     }
 }
