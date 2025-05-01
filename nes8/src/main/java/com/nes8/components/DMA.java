@@ -12,6 +12,7 @@ public class DMA {
     * CPU is possibly forzen during this time
     */
     public static void startDMATransfer(int address, RAM ram, PPU ppu){
+        System.out.println("DMA Transfer");
         for(int i = 0; i < 256; ++i){
             ppu.oam.write(i , ram.read(address + i ));
         }

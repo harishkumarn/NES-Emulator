@@ -62,6 +62,7 @@ public class PPU {
             case 0x2005:// PPUSCROLL
             break;
             case 0x2007:// PPUDATA
+            System.out.println("Nametable init");
             nt.write(registers[6], data);
             break;
         }

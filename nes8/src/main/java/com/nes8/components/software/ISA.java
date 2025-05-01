@@ -51,7 +51,16 @@ public class ISA {
     }
 
     private void SBC(byte value){
-        
+        int result = cpu.accumulator - value - 1 + cpu.getFlag(Flag.C);
+        int unsigned = result & 0xFF;
+
+        cpu.updateFlag(Flag.Z, result == 0);
+        cpu.updateFlag(Flag.C, result >= 0 );
+
+        //TODO : Cross check the following 2 flags
+        cpu.updateFlag(Flag.V,((cpu.accumulator ^ value) & 0x80) != 0 && ((cpu.accumulator ^ unsigned) & 0x80) != 0);
+        cpu.updateFlag(Flag.N, (unsigned & 0x80) > 0 );
+        cpu.accumulator = (byte)(unsigned & 0xFF);
     }
 
     private void LSR(int address){
@@ -1652,7 +1661,7 @@ public class ISA {
     opcodes.put(0xED, new Opcode((byte)4) {
         @Override
         public byte execute(){
-            int address = cpu.getIndirect();
+            int address = cpu.getAbsolute();
             SBC(cpu.bus.cpuRead(address));
             printASM("SBC A " + Integer.toHexString(address));
             return (byte)cycle;
@@ -1694,7 +1703,39 @@ public class ISA {
             return (byte)cycle;
         }
     });
-    //SEC, SED, SEI, 
-    //TAX, TAY, TSX, TXA, TXS, TYA
+    //---------------------
+    //SEC
+    opcodes.put(0x38, new Opcode((byte)2) {
+        @Override
+        public byte execute(){
+            cpu.updateFlag(Flag.C, true);
+            printASM("SEC");
+            return (byte)cycle;
+        }
+    });
+    //---------------------
+    //SED
+    opcodes.put(0xF8, new Opcode((byte)2) {
+        @Override
+        public byte execute(){
+            cpu.updateFlag(Flag.D, true);
+            printASM("SED");
+            return (byte)cycle;
+        }
+    });
+    //---------------------
+    //SEI
+    opcodes.put(0x78, new Opcode((byte)2) {
+        @Override
+        public byte execute(){
+            cpu.updateFlag(Flag.I, true);
+            printASM("SEI");
+            return (byte)cycle;
+        }
+    }); 
+    //--------------------
+    //TAX
+
+    //TAY, TSX, TXA, TXS, TYA
     }
 }
