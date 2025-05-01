@@ -21,21 +21,22 @@ public class Bus{
     }
 
     public byte cpuRead(int address){
+        byte res = 0 ;
         if(address >= 0x0000 && address <= 0x1FFF){
-            return ram.read(address & 0x07FF);// Mirrored every 2KB
+            res = ram.read(address & 0x07FF);// Mirrored every 2KB
         }
         else if(address >= 0x2000 && address <= 0x3FFF){
-            return ppu.registers[(address - 0x2000 ) & 0x7];// mirrored every 8 bytes
+            res = ppu.registers[(address - 0x2000 ) & 0x7];// mirrored every 8 bytes
         }
         else if( address == 0x4015){
-            return apu.getStatusRegister();
+            res =  apu.getStatusRegister();
         }else if(address == 0x4016 || address == 0x4017){
-            return controller.rightShiftRegister(address);
+            res = controller.rightShiftRegister(address);
         }
         else if(address >= 4020 && address <= 0xFFFF){
-            return rom.mmc.read(address);
+            res = rom.mmc.read(address);
         }
-        return 0;
+        return (byte)(res & 0xFF);
     }
 
     public byte ppuRead(int address){

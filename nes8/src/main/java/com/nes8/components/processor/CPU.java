@@ -65,8 +65,9 @@ public class CPU{
     public void interpret() throws InterruptedException{
         try{
             while(programCounter <= this.byteCodeLastAddress){
-                byte inst = bus.cpuRead(programCounter);
-                if(Settings.DISASSEMBLE_ASM) System.out.print(Integer.toHexString(programCounter++) + "    ");
+                int pc = programCounter;
+                byte inst = bus.cpuRead(programCounter++);
+                if(Settings.DISASSEMBLE_ASM) System.out.print(Integer.toHexString(pc) + "    ");
                 byte cycles = isa.getOpcode(inst).execute();
                 cycle(cycles);
             }
