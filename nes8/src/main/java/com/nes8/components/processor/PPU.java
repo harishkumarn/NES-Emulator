@@ -57,7 +57,7 @@ public class PPU {
             case 0x2002:// PPUSTATUS
             break;
             case 0x2004:// OAMDATA
-            oam.write(registers[3], data);
+            oam.write(registers[3], data); 
             break;
             case 0x2005:// PPUSCROLL
             break;
