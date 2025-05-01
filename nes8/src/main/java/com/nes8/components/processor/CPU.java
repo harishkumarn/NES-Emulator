@@ -47,7 +47,7 @@ public class CPU{
     public Bus bus;
     DMA dma = new DMA();
     ObjectAttributeMemory oam = new ObjectAttributeMemory();
-    public Stack<Integer> stack = new Stack<Integer>();
+    public Stack<Byte> stack = new Stack<Byte>();
     ISA isa = new ISA(this);
 
 
@@ -66,7 +66,7 @@ public class CPU{
     public void interpret() throws InterruptedException{
         while(programCounter <= this.byteCodeLastAddress){
             byte inst = bus.cpuRead(programCounter);
-            System.out.print(Integer.toHexString(programCounter) + "    ");
+            if(Settings.DISASSEMBLE_ASM) System.out.print(Integer.toHexString(programCounter++) + "    ");
             byte cycles = isa.getOpcode(inst).execute();
             cycle(cycles);
         }
@@ -74,13 +74,20 @@ public class CPU{
 
     public void updateFlag(Flag flag, boolean yes){
         if(yes) {
-            this.stackPointer |= flag.index;
+            this.statusRegister |= flag.index;
         }else if((this.statusRegister & flag.index) > 0){
-            this.stackPointer ^= flag.index;
+            this.statusRegister ^= flag.index;
         }
     }
 
     public byte getFlag(Flag flag){
         return (byte) ((this.statusRegister & flag.index) > 0 ? 1 : 0) ;
+    }
+
+    public void pushPCToStack(){
+        byte high = (byte)((programCounter >> 8 ) & 0xFF);
+        stack.push(high);
+        byte low = (byte)(programCounter & 0xFF);
+        stack.push(low);
     }
 }

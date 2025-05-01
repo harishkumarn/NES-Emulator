@@ -14,4 +14,6 @@ public class Settings {
     public static boolean RENDER_META_DATA = true;
 
     public static float GAME_SPEED = 1f;
+
+    public static boolean DISASSEMBLE_ASM = false;
 }

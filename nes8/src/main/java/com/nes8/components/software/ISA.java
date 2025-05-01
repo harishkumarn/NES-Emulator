@@ -503,10 +503,9 @@ public class ISA {
                 // IMPLEMENT
                 // IRQ
                 cpu.programCounter ++;
-                cpu.stack.push((cpu.programCounter >> 8 ) & 0xFF);
-                cpu.stack.push(cpu.programCounter  & 0xFF);
+                cpu.pushPCToStack();
                 cpu.updateFlag(Flag.I, true);
-                cpu.stack.push(cpu.statusRegister +  0);
+                cpu.stack.push(cpu.statusRegister );
                 cpu.updateFlag(Flag.I, false);// ?? is this needed
 
                 cpu.programCounter = (short)((cpu.bus.cpuRead(0xFFFF) << 8 ) | (cpu.bus.cpuRead(0xFFFE)));
@@ -958,7 +957,7 @@ public class ISA {
                 byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
                 cpu.accumulator = (byte) (cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexX) ^ cpu.accumulator) ;
                 updateDEC_INC_EOR_Flags( cpu.accumulator  );
-                printASM("EOC $" +  Integer.toHexString((operand1 << 8 ) + operand2) + ", X");
+                printASM("EOR $" +  Integer.toHexString((operand1 << 8 ) + operand2) + ", X");
                 return (byte)cycle;
             }
         });
@@ -970,12 +969,76 @@ public class ISA {
                 byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
                 cpu.accumulator = (byte) (cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexY) ^ cpu.accumulator) ;
                 updateDEC_INC_EOR_Flags( cpu.accumulator  );
-                printASM("EOC $" +  Integer.toHexString((operand1 << 8 ) + operand2) + ", Y");
+                printASM("EOR $" +  Integer.toHexString((operand1 << 8 ) + operand2) + ", Y");
                 return (byte)cycle;
             }
         });
-    }
+    
+    //------------------------
+    //JMP
+        opcodes.put(0x4C, new Opcode((byte)3){
+            @Override
+            public byte execute(){
+                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
+                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
+                cpu.programCounter = (operand1 << 8) + operand2;
+                printASM("JMP #" + Integer.toHexString(cpu.programCounter));
+                return (byte)cycle;
+            }
+        });
 
-    // JMP, JSR, LDA, LDX, LDY, LSR, ORA, PHA, PHP, PLA, PLP, ROL, ROR, RTI, RTS, SBC, SEC, SED, SEI, STA, STX, STY, 
+        opcodes.put(0x6C, new Opcode((byte)5){
+            @Override
+            public byte execute(){
+                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
+                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
+                cpu.programCounter = ( cpu.bus.cpuRead(operand1) << 8 )  + cpu.bus.cpuRead(operand2);
+                printASM("JMP $" + Integer.toHexString(cpu.programCounter));
+                return (byte)cycle;
+            }
+        });
+
+    //-----------------------------
+    //JSR
+    opcodes.put(0x29, new Opcode((byte)6){
+        @Override
+        public byte execute(){
+            byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
+            byte operand1 = cpu.bus.cpuRead(cpu.programCounter);
+
+            cpu.pushPCToStack();
+            cpu.programCounter = ( cpu.bus.cpuRead(operand1) << 8 )  + cpu.bus.cpuRead(operand2);
+            printASM("JSR #" + Integer.toHexString(cpu.programCounter));
+            return (byte)cycle;
+        }   
+    });
+    //-----------------------------------
+    //RTS
+    opcodes.put(0x60, new Opcode((byte)6){
+        @Override
+        public byte execute(){
+            byte low = cpu.stack.pop();
+            byte high = cpu.stack.pop();
+            cpu.programCounter = ((high << 8 ) + low) + 1;
+            printASM("RTS");
+            return (byte)cycle;
+        }
+    });
+
+    //-----------------------------------
+    //RTI
+    opcodes.put(0x40, new Opcode((byte)6){
+        @Override
+        public byte execute(){
+            cpu.statusRegister = cpu.stack.pop();
+            byte low = cpu.stack.pop();
+            byte high = cpu.stack.pop();
+            cpu.programCounter = (high << 8) + low;
+            printASM("RTI");
+            return (byte)cycle;
+        }
+    });
+    //LDA, LDX, LDY, LSR, ORA, PHA, PHP, PLA, PLP, ROL, ROR, SBC, SEC, SED, SEI, STA, STX, STY, 
     //TAX, TAY, TSX, TXA, TXS, TYA
+    }
 }
