@@ -84,10 +84,74 @@ public class CPU{
         return (byte) ((this.statusRegister & flag.index) > 0 ? 1 : 0) ;
     }
 
-    public void pushPCToStack(){
-        byte high = (byte)((programCounter >> 8 ) & 0xFF);
+    public void pushAddressToStack(int address){
+        byte high = (byte)((address >> 8 ) & 0xFF);
         stack.push(high);
-        byte low = (byte)(programCounter & 0xFF);
+        byte low = (byte)(address & 0xFF);
         stack.push(low);
     }
+
+    // Addressing modes of 6502
+    public byte getZeroPage(){
+        return bus.cpuRead(programCounter++);
+    }
+
+    public byte getZeroPageX(){
+        int address = (bus.cpuRead(programCounter++) + indexX ) & 0xFF; 
+        return (byte)address;
+    }
+
+    public byte getZeroPageY(){
+        int address = (bus.cpuRead(programCounter++) + indexY ) & 0xFF; 
+        return (byte)address;
+    }
+
+    public int getAbsolute(){
+        byte low = bus.cpuRead(programCounter++);
+        byte high = bus.cpuRead(programCounter++);
+        return bus.cpuRead( (high << 8 )+ low) ;
+    }
+
+    public int getAbsoluteX(){
+        byte low = bus.cpuRead(programCounter++);
+        byte high = bus.cpuRead(programCounter++);
+        int address =  ((high << 8 )+ low + indexX) & 0xFFFF;
+        return address;
+    }
+
+    public int getAbsoluteY(){
+        byte low = bus.cpuRead(programCounter++);
+        byte high = bus.cpuRead(programCounter++);
+        int address =  ((high << 8 )+ low + indexY) & 0xFFFF;
+        return address;
+    }
+
+    public int getIndirect(){
+       byte low = bus.cpuRead(programCounter++);
+       byte high = bus.cpuRead(programCounter++);
+       int address =  ((high << 8) + low ) & 0xFFFF;
+       low  = bus.cpuRead(address);
+       
+       //TODO: verify the following line once again
+       high = bus.cpuRead((address & 0xFF00) | ((address + 1) & 0xFF));
+       address =  ((high << 8) + low ) & 0xFFFF;
+       return address;
+    }
+
+    public int getIndirectX(){
+        int address = getZeroPageX();
+        byte low = bus.cpuRead(address);
+        byte high = bus.cpuRead(address+1);
+        address = ((high << 8 ) + low ) & 0xFFFF;
+        return address;
+    }
+
+    public int getIndirectY(){
+        int address = getZeroPage();
+        byte low = bus.cpuRead(address);
+        byte high = bus.cpuRead(address+1);
+        address = ((high << 8 ) + low  + indexY) & 0xFFFF;
+        return address;
+    }
+
 }

@@ -49,8 +49,9 @@ public class ISA {
         cpu.updateFlag(Flag.N, val < 0 );
     }
 
+    //----------------------
+    // ADC
     private void initOpcodes(){
-        // ADC
         opcodes.put(0x69, new Opcode((byte)2){
             @Override
             public byte execute(){
@@ -58,90 +59,84 @@ public class ISA {
                 int temp = cpu.accumulator + operand  + cpu.getFlag(Flag.C);
                 updateADCFlags(cpu.accumulator, operand , cpu.getFlag(Flag.C));
                 cpu.accumulator = (byte)(temp & 0xFF);
-                printASM("ADC #"+ Integer.toHexString(operand));
+                printASM("ADC "+ Integer.toHexString(operand));
                 return (byte)cycle;
             }
         });
         opcodes.put(0x65, new Opcode((byte)3){
-            // Zero page
             @Override
             public byte execute(){
-                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp = cpu.accumulator + cpu.bus.cpuRead(operand) +  cpu.getFlag(Flag.C);
-                updateADCFlags(cpu.accumulator,cpu.bus.cpuRead(operand), cpu.getFlag(Flag.C));
+                int address = cpu.getZeroPage();
+                int temp = cpu.accumulator + cpu.bus.cpuRead(address) +  cpu.getFlag(Flag.C);
+                updateADCFlags(cpu.accumulator,cpu.bus.cpuRead(address), cpu.getFlag(Flag.C));
                 cpu.accumulator = (byte)(temp & 0xFF);
-                printASM("ADC "+ Integer.toHexString(operand));
+                printASM("ADC Z "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
         opcodes.put(0x75,new Opcode((byte)4){
             @Override
             public byte execute(){
-                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp = cpu.accumulator + cpu.bus.cpuRead(operand + cpu.indexX) +  cpu.getFlag(Flag.C);
-                updateADCFlags(cpu.accumulator, cpu.bus.cpuRead(operand + cpu.indexX), cpu.getFlag(Flag.C));
+                int address = cpu.getZeroPageX();
+                int temp = cpu.accumulator + cpu.bus.cpuRead(address ) +  cpu.getFlag(Flag.C);
+                updateADCFlags(cpu.accumulator, cpu.bus.cpuRead(address), cpu.getFlag(Flag.C));
                 cpu.accumulator = (byte)(temp & 0xFF);
-                printASM("ADC "+ Integer.toHexString(operand) + " ,X");
+                printASM("ADC Zx "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
         opcodes.put(0x6D,new Opcode((byte)4){
             @Override
             public byte execute(){
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp = cpu.accumulator + cpu.bus.cpuRead( (operand2 << 8 ) + operand1) +  cpu.getFlag(Flag.C);
-                updateADCFlags(cpu.accumulator,cpu.bus.cpuRead( (operand2 << 8 ) + operand1) , cpu.getFlag(Flag.C));
+                int address = cpu.getAbsolute();
+                int temp = cpu.accumulator + cpu.bus.cpuRead(address) +  cpu.getFlag(Flag.C);
+                updateADCFlags(cpu.accumulator,cpu.bus.cpuRead( address) , cpu.getFlag(Flag.C));
                 cpu.accumulator = (byte)(temp & 0xFF);
-                printASM("ADC "+ Integer.toHexString((operand2 << 8 ) + operand1) );
+                printASM("ADC A "+ Integer.toHexString(address) );
                 return (byte)cycle;
             }
         });
         opcodes.put(0x7D,new Opcode((byte)4){
             @Override
             public byte execute(){
-                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp = cpu.accumulator + cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexX) +  cpu.getFlag(Flag.C);
-                updateADCFlags(cpu.accumulator, cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexX), cpu.getFlag(Flag.C));
+                int address = cpu.getAbsoluteX();
+                int temp = cpu.accumulator + cpu.bus.cpuRead( address) +  cpu.getFlag(Flag.C);
+                updateADCFlags(cpu.accumulator, cpu.bus.cpuRead(address), cpu.getFlag(Flag.C));
                 cpu.accumulator = (byte)(temp & 0xFF);
-                printASM("ADC "+ Integer.toHexString((operand1 << 8 ) + operand2) + " ,X" );
+                printASM("ADC Ax "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
         opcodes.put(0x79,new Opcode((byte)4){
             @Override
             public byte execute(){
-                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp = cpu.accumulator + cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexY) +  cpu.getFlag(Flag.C);
-                updateADCFlags(cpu.accumulator,cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexY)  , cpu.getFlag(Flag.C));
+                int address = cpu.getAbsoluteY();
+                int temp = cpu.accumulator + cpu.bus.cpuRead( address) +  cpu.getFlag(Flag.C);
+                updateADCFlags(cpu.accumulator,cpu.bus.cpuRead(address)  , cpu.getFlag(Flag.C));
                 cpu.accumulator = (byte)(temp & 0xFF);
-                printASM("ADC "+ Integer.toHexString((operand1 << 8 ) + operand2) + " ,Y" );
+                printASM("ADC Ay "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
         opcodes.put(0x61,new Opcode((byte)6){
             @Override
             public byte execute(){
-                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
-                int address = (cpu.bus.cpuRead(operand + 1) << 8 )  + cpu.bus.cpuRead(operand );
+                int address = cpu.getIndirectX();
                 int temp = cpu.accumulator + cpu.bus.cpuRead(address ) +  cpu.getFlag(Flag.C);
                 updateADCFlags(cpu.accumulator, cpu.bus.cpuRead(address ), cpu.getFlag(Flag.C));
                 cpu.accumulator = (byte)(temp & 0xFF);
-                printASM("ADC ("+ Integer.toHexString(operand) + " ,X)" );
+                printASM("ADC Ix "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
         opcodes.put(0x71,new Opcode((byte)5){
             @Override
             public byte execute(){
-                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
-                int address = (cpu.bus.cpuRead(operand + 1) << 8 )  + cpu.bus.cpuRead(operand ) +  cpu.indexY;
+                int address = cpu.getIndirectY();
                 int temp = cpu.accumulator + cpu.bus.cpuRead(address ) +  cpu.getFlag(Flag.C);
                 updateADCFlags(cpu.accumulator,cpu.bus.cpuRead(address ) , cpu.getFlag(Flag.C));
                 cpu.accumulator = (byte)(temp & 0xFF);
-                printASM("ADC ("+ Integer.toHexString(operand) + ") ,Y" );
+                printASM("ADC Iy "+ Integer.toHexString(address) );
                 return (byte)cycle;
             }
         });
@@ -156,90 +151,84 @@ public class ISA {
                 int temp = cpu.accumulator & operand ;
                 updateANDFlags(temp);
                 cpu.accumulator = (byte)(temp & 0xFF);
-                printASM("AND #"+ Integer.toHexString(operand));
+                printASM("AND "+ Integer.toHexString(operand));
                 return (byte)cycle;
             }
         });
         opcodes.put(0x25, new Opcode((byte)3){
-            // Zero page
             @Override
             public byte execute(){
-                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp = cpu.accumulator & cpu.bus.cpuRead(operand);
+                int address = cpu.getZeroPage();
+                int temp = cpu.accumulator & cpu.bus.cpuRead(address);
                 updateANDFlags(temp);
                 cpu.accumulator = (byte)(temp & 0xFF);
-                printASM("AND "+ Integer.toHexString(operand));
+                printASM("AND Z "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
         opcodes.put(0x35,new Opcode((byte)4){
             @Override
             public byte execute(){
-                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp = cpu.accumulator & cpu.bus.cpuRead(operand + cpu.indexX);
+                int address = cpu.getZeroPageX();
+                int temp = cpu.accumulator & cpu.bus.cpuRead(address);
                 updateANDFlags(temp);
                 cpu.accumulator = (byte)(temp & 0xFF);
-                printASM("AND "+ Integer.toHexString(operand) + " ,X");
+                printASM("AND Zx "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
         opcodes.put(0x2D,new Opcode((byte)4){
             @Override
             public byte execute(){
-                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp = cpu.accumulator & cpu.bus.cpuRead( (operand1 << 8 ) + operand2) ;
+                int address = cpu.getAbsolute();
+                int temp = cpu.accumulator & cpu.bus.cpuRead(address) ;
                 updateANDFlags(temp);
                 cpu.accumulator = (byte)(temp & 0xFF);
-                printASM("AND "+ Integer.toHexString((operand1 << 8 ) + operand2) );
+                printASM("AND A "+ Integer.toHexString(address ));
                 return (byte)cycle;
             }
         });
         opcodes.put(0x3D,new Opcode((byte)4){
             @Override
             public byte execute(){
-                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp = cpu.accumulator & cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexX) ;
+                int address = cpu.getAbsoluteX();
+                int temp = cpu.accumulator & cpu.bus.cpuRead(address) ;
                 updateANDFlags(temp);
                 cpu.accumulator = (byte)(temp & 0xFF);
-                printASM("AND "+ Integer.toHexString((operand1 << 8 ) + operand2) + " ,X" );
+                printASM("AND Ax "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
         opcodes.put(0x39,new Opcode((byte)4){
             @Override
             public byte execute(){
-                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp = cpu.accumulator & cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexY) ;
+                int address = cpu.getAbsoluteY();
+                int temp = cpu.accumulator & cpu.bus.cpuRead(address) ;
                 updateANDFlags(temp);
                 cpu.accumulator = (byte)(temp & 0xFF);
-                printASM("AND "+ Integer.toHexString((operand1 << 8 ) + operand2) + " ,Y" );
+                printASM("AND Ay "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
         opcodes.put(0x21,new Opcode((byte)6){
             @Override
             public byte execute(){
-                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
-                int address = (cpu.bus.cpuRead(operand + 1) << 8 )  + cpu.bus.cpuRead(operand );
+                int address = cpu.getIndirectX();
                 int temp = cpu.accumulator & cpu.bus.cpuRead(address ) ;
                 updateANDFlags(temp);
                 cpu.accumulator = (byte)(temp & 0xFF);
-                printASM("AND ("+ Integer.toHexString(operand) + " ,X)" );
+                printASM("AND Ix "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
         opcodes.put(0x31,new Opcode((byte)5){
             @Override
             public byte execute(){
-                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
-                int address = (cpu.bus.cpuRead(operand + 1) << 8 )  + cpu.bus.cpuRead(operand ) +  cpu.indexY;
+                int address = cpu.getIndirectY();
                 int temp = cpu.accumulator & cpu.bus.cpuRead(address ) ;
                 updateANDFlags(temp);
                 cpu.accumulator = (byte)(temp & 0xFF);
-                printASM("AND ("+ Integer.toHexString(operand) + ") ,Y" );
+                printASM("AND Iy "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -259,49 +248,46 @@ public class ISA {
             }
         });
         opcodes.put(0x06, new Opcode((byte)5){
-            // Zero page
             @Override
             public byte execute(){
-                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp = cpu.bus.cpuRead(operand) << 1;
+                int address = cpu.getZeroPage();
+                int temp = cpu.bus.cpuRead(address) << 1;
                 updateASLFlags(temp);
-                cpu.bus.cpuWrite(operand, (byte)(temp & 0xFF));
-                printASM("ASL "+ Integer.toHexString(operand));
+                cpu.bus.cpuWrite(address, (byte)(temp & 0xFF));
+                printASM("ASL Z "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
         opcodes.put(0x16,new Opcode((byte)6){
             @Override
             public byte execute(){
-                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp = cpu.bus.cpuRead(operand + cpu.indexX) << 1;
+                int address = cpu.getZeroPageX();
+                int temp = cpu.bus.cpuRead(address) << 1;
                 updateASLFlags(temp);
-                cpu.bus.cpuWrite(operand + cpu.indexX, (byte)(temp & 0xFF));
-                printASM("ASL "+ Integer.toHexString(operand) + " ,X");
+                cpu.bus.cpuWrite(address, (byte)(temp & 0xFF));
+                printASM("ASL Zx "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
         opcodes.put(0x0E,new Opcode((byte)6){
             @Override
             public byte execute(){
-                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp =  cpu.bus.cpuRead( (operand1 << 8 ) + operand2) << 1;
+                int address = cpu.getAbsolute();
+                int temp =  cpu.bus.cpuRead( address) << 1;
                 updateASLFlags(temp);
-                cpu.bus.cpuWrite((operand1 << 8 ) + operand2, (byte)(temp & 0xFF));
-                printASM("ASL "+ Integer.toHexString((operand1 << 8 ) + operand2) );
+                cpu.bus.cpuWrite(address, (byte)(temp & 0xFF));
+                printASM("ASL A "+ Integer.toHexString(address) );
                 return (byte)cycle;
             }
         });
         opcodes.put(0x1E,new Opcode((byte)7){
             @Override
             public byte execute(){
-                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp = cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexX) << 1;
+                int address = cpu.getAbsoluteX();
+                int temp = cpu.bus.cpuRead(address) << 1;
                 updateASLFlags(temp);
-                cpu.bus.cpuWrite((operand1 << 8 ) + operand2 + cpu.indexX, (byte)(temp & 0xFF));
-                printASM("ASL "+ Integer.toHexString((operand1 << 8 ) + operand2) + " ,X" );
+                cpu.bus.cpuWrite(address, (byte)(temp & 0xFF));
+                printASM("ASL Ax "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -500,10 +486,10 @@ public class ISA {
         opcodes.put(0x00,new Opcode((byte)7){
             @Override
             public byte execute(){
-                // IMPLEMENT
-                // IRQ
+                // TODO: IRQ
+
                 cpu.programCounter ++;
-                cpu.pushPCToStack();
+                cpu.pushAddressToStack(cpu.programCounter);
                 cpu.updateFlag(Flag.I, true);
                 cpu.stack.push(cpu.statusRegister );
                 cpu.updateFlag(Flag.I, false);// ?? is this needed
@@ -519,12 +505,12 @@ public class ISA {
         opcodes.put(0x24,new Opcode((byte)3){
             @Override
             public byte execute(){
-                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
-                byte m = cpu.bus.cpuRead(operand);
+                int address = cpu.getZeroPage();
+                byte m = cpu.bus.cpuRead(address);
                 cpu.updateFlag(Flag.N, ( m & 0x80) > 0 );
                 cpu.updateFlag(Flag.V, ( m & 0x40) > 0);
                 cpu.updateFlag(Flag.Z, ( (cpu.accumulator & m ) & 0xFF )  == 0);
-                printASM("BIT " + Integer.toHexString(operand) );
+                printASM("BIT Z " + Integer.toHexString(address) );
                 return (byte)cycle;
             }
         });
@@ -532,13 +518,12 @@ public class ISA {
         opcodes.put(0x2C,new Opcode((byte)4){
             @Override
             public byte execute(){
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte m = cpu.bus.cpuRead((operand2 << 8) + operand1);
+                int address = cpu.getAbsolute();
+                byte m = cpu.bus.cpuRead(address);
                 cpu.updateFlag(Flag.N, ( m & 0x80) > 0 );
                 cpu.updateFlag(Flag.V, ( m & 0x40) > 0);
                 cpu.updateFlag(Flag.Z, ( (cpu.accumulator & m ) & 0xFF )  == 0);
-                printASM("BIT " + Integer.toHexString((operand2 << 8) + operand1) );
+                printASM("BIT A " + Integer.toHexString(address ));
                 return (byte)cycle;
             }
         });
@@ -552,83 +537,77 @@ public class ISA {
                 byte operand = cpu.bus.cpuRead(cpu.programCounter++);
                 int temp = cpu.accumulator - operand ;
                 updateCMPFlags(temp);
-                printASM("CMP #"+ Integer.toHexString(operand));
+                printASM("CMP "+ Integer.toHexString(operand));
                 return (byte)cycle;
             }
         });
         opcodes.put(0xC5, new Opcode((byte)3){
-            // Zero page
             @Override
             public byte execute(){
-                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp = cpu.accumulator - cpu.bus.cpuRead(operand) ;
+                int address = cpu.getZeroPage();
+                int temp = cpu.accumulator - cpu.bus.cpuRead(address) ;
                 updateCMPFlags(temp);
-                printASM("CMP "+ Integer.toHexString(operand));
+                printASM("CMP Z "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
         opcodes.put(0xD5,new Opcode((byte)4){
             @Override
             public byte execute(){
-                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp = cpu.accumulator - cpu.bus.cpuRead(operand + cpu.indexX) ;
+                int address = cpu.getZeroPageX();
+                int temp = cpu.accumulator - cpu.bus.cpuRead(address) ;
                 updateCMPFlags(temp);
-                printASM("CMP "+ Integer.toHexString(operand) + " ,X");
+                printASM("CMP Zx "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
         opcodes.put(0xCD,new Opcode((byte)4){
             @Override
             public byte execute(){
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp = cpu.accumulator - cpu.bus.cpuRead( (operand2 << 8 ) + operand1) ;
+                int address = cpu.getAbsolute();
+                int temp = cpu.accumulator - cpu.bus.cpuRead(address) ;
                 updateCMPFlags(temp);
-                printASM("CMP "+ Integer.toHexString((operand2 << 8 ) + operand1) );
+                printASM("CMP A "+ Integer.toHexString(address ));
                 return (byte)cycle;
             }
         });
         opcodes.put(0xDD,new Opcode((byte)4){
             @Override
             public byte execute(){
-                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp = cpu.accumulator - cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexX) ;
+                int address = cpu.getAbsoluteX();
+                int temp = cpu.accumulator - cpu.bus.cpuRead( address);
                 updateCMPFlags(temp);
-                printASM("CMP "+ Integer.toHexString((operand1 << 8 ) + operand2) + " ,X" );
+                printASM("CMP Ax "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
         opcodes.put(0xD9,new Opcode((byte)4){
             @Override
             public byte execute(){
-                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp = cpu.accumulator - cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexY) ;
+                int address = cpu.getAbsoluteY();
+                int temp = cpu.accumulator - cpu.bus.cpuRead( address) ;
                 updateCMPFlags(temp);
-                printASM("CMP "+ Integer.toHexString((operand1 << 8 ) + operand2) + " ,Y" );
+                printASM("CMP Ay "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
         opcodes.put(0xC1,new Opcode((byte)6){
             @Override
             public byte execute(){
-                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
-                int address = (cpu.bus.cpuRead(operand + 1) << 8 )  + cpu.bus.cpuRead(operand );
+                int address = cpu.getIndirectX();
                 int temp = cpu.accumulator - cpu.bus.cpuRead(address );
                 updateCMPFlags(temp);
-                printASM("CMP ("+ Integer.toHexString(operand) + " ,X)" );
+                printASM("CMP Ix "+ Integer.toHexString(address) );
                 return (byte)cycle;
             }
         });
         opcodes.put(0xD1,new Opcode((byte)5){
             @Override
             public byte execute(){
-                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
-                int address = (cpu.bus.cpuRead(operand + 1) << 8 )  + cpu.bus.cpuRead(operand ) +  cpu.indexY;
+                int address = cpu.getIndirectY();
                 int temp = cpu.accumulator - cpu.bus.cpuRead(address );
                 updateCMPFlags(temp);
-                printASM("CMP ("+ Integer.toHexString(operand) + ") ,Y" );
+                printASM("CMP Iy "+ Integer.toHexString(address) );
                 return (byte)cycle;
             }
         });
@@ -647,13 +626,12 @@ public class ISA {
         });
 
         opcodes.put(0xE4, new Opcode((byte)3){
-            // Zero page
             @Override
             public byte execute(){
-                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp = cpu.indexX - cpu.bus.cpuRead(operand) ;
+                int address = cpu.getZeroPage();
+                int temp = cpu.indexX - cpu.bus.cpuRead(address) ;
                 updateCMPFlags(temp);
-                printASM("CPX "+ Integer.toHexString(operand));
+                printASM("CPX Z "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -661,11 +639,10 @@ public class ISA {
         opcodes.put(0xEC,new Opcode((byte)4){
             @Override
             public byte execute(){
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp = cpu.indexX - cpu.bus.cpuRead( (operand2 << 8 ) + operand1) ;
+                int address = cpu.getAbsolute();
+                int temp = cpu.indexX - cpu.bus.cpuRead( address) ;
                 updateCMPFlags(temp);
-                printASM("CPX "+ Integer.toHexString((operand2 << 8 ) + operand1) );
+                printASM("CPX A "+ Integer.toHexString(address ));
                 return (byte)cycle;
             }
         });
@@ -679,19 +656,18 @@ public class ISA {
                 byte operand = cpu.bus.cpuRead(cpu.programCounter++);
                 int temp = cpu.indexY - operand ;
                 updateCMPFlags(temp);
-                printASM("CPY #"+ Integer.toHexString(operand));
+                printASM("CPY "+ Integer.toHexString(operand));
                 return (byte)cycle;
             }
         });
 
         opcodes.put(0xC4, new Opcode((byte)3){
-            // Zero page
             @Override
             public byte execute(){
-                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp = cpu.indexY - cpu.bus.cpuRead(operand) ;
+                int address = cpu.getZeroPage();
+                int temp = cpu.indexY - cpu.bus.cpuRead(address) ;
                 updateCMPFlags(temp);
-                printASM("CPY "+ Integer.toHexString(operand));
+                printASM("CPY Z "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -699,11 +675,10 @@ public class ISA {
         opcodes.put(0xCC,new Opcode((byte)4){
             @Override
             public byte execute(){
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp = cpu.indexY - cpu.bus.cpuRead( (operand2 << 8 ) + operand1) ;
+                int address = cpu.getAbsolute();
+                int temp = cpu.indexY - cpu.bus.cpuRead( address) ;
                 updateCMPFlags(temp);
-                printASM("CPY "+ Integer.toHexString((operand2 << 8 ) + operand1) );
+                printASM("CPY A "+ Integer.toHexString(address) );
                 return (byte)cycle;
             }
         });
@@ -724,11 +699,11 @@ public class ISA {
         opcodes.put(0xC6,new Opcode((byte)5){
             @Override
             public byte execute(){
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte val = (byte) (cpu.bus.cpuRead( operand1) - 1);
+                byte address = cpu.getZeroPage();
+                byte val = (byte) (cpu.bus.cpuRead( address) - 1);
                 updateDEC_INC_EOR_Flags( val  );
-                cpu.bus.cpuWrite(operand1, val);
-                printASM("DEC " + Integer.toHexString(operand1)); 
+                cpu.bus.cpuWrite(address, val);
+                printASM("DEC Z " + Integer.toHexString(address)); 
                 return (byte)cycle;
             }
         });
@@ -736,11 +711,11 @@ public class ISA {
         opcodes.put(0xD6,new Opcode((byte)6){
             @Override
             public byte execute(){
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte val = (byte) (cpu.bus.cpuRead( operand1 + cpu.indexX) - 1); 
+                int address = cpu.getZeroPageX();
+                byte val = (byte) (cpu.bus.cpuRead( address) - 1); 
                 updateDEC_INC_EOR_Flags( val  );
-                cpu.bus.cpuWrite(  operand1 + cpu.indexX, val);
-                printASM("DEC " +  Integer.toHexString(operand1) + " ,X");
+                cpu.bus.cpuWrite(  address, val);
+                printASM("DEC Zx " +  Integer.toHexString(address) );
                 return (byte)cycle;
             }
         });
@@ -748,12 +723,11 @@ public class ISA {
         opcodes.put(0xCE,new Opcode((byte)6){
             @Override
             public byte execute(){
-                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte val = (byte) (cpu.bus.cpuRead( (operand1 << 8 ) + operand2 ) - 1);
+                int address = cpu.getAbsolute();
+                byte val = (byte) (cpu.bus.cpuRead(address ) - 1);
                 updateDEC_INC_EOR_Flags( val  );
-                cpu.bus.cpuWrite( (operand1 << 8 ) + operand2 , val);
-                printASM("DEC " +  Integer.toHexString((operand1 << 8 ) + operand2));
+                cpu.bus.cpuWrite( address , val);
+                printASM("DEC A " +  Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -761,12 +735,11 @@ public class ISA {
         opcodes.put(0xDE,new Opcode((byte)7){
             @Override
             public byte execute(){
-                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte val = (byte) (cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexX) - 1) ;
+                int address = cpu.getAbsoluteX();
+                byte val = (byte) (cpu.bus.cpuRead(address) - 1) ;
                 updateDEC_INC_EOR_Flags( val  );
-                cpu.bus.cpuWrite( (operand1 << 8 ) + operand2 + cpu.indexX, val);
-                printASM("DEC " +  Integer.toHexString((operand1 << 8 ) + operand2) + ", X");
+                cpu.bus.cpuWrite( address, val);
+                printASM("DEC Ax " +  Integer.toHexString(address ));
                 return (byte)cycle;
             }
         });
@@ -825,11 +798,11 @@ public class ISA {
         opcodes.put(0xE6,new Opcode((byte)5){
             @Override
             public byte execute(){
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte val = (byte) (cpu.bus.cpuRead( operand1) + 1);
+                byte address = cpu.getZeroPage();
+                byte val = (byte) (cpu.bus.cpuRead( address) + 1);
                 updateDEC_INC_EOR_Flags( val  );
-                cpu.bus.cpuWrite(operand1, val);
-                printASM("INC " + Integer.toHexString(operand1));
+                cpu.bus.cpuWrite(address, val);
+                printASM("INC Z " + Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -837,11 +810,11 @@ public class ISA {
         opcodes.put(0xF6,new Opcode((byte)6){
             @Override
             public byte execute(){
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte val = (byte) (cpu.bus.cpuRead( operand1 + cpu.indexX) + 1); 
+                int address = cpu.getZeroPageX();
+                byte val = (byte) (cpu.bus.cpuRead(address) + 1); 
                 updateDEC_INC_EOR_Flags( val  );
-                cpu.bus.cpuWrite(  operand1 + cpu.indexX, val);
-                printASM("INC " +  Integer.toHexString(operand1) + " ,X");
+                cpu.bus.cpuWrite( address, val);
+                printASM("INC Zx " +  Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -849,12 +822,11 @@ public class ISA {
         opcodes.put(0xEE,new Opcode((byte)6){
             @Override
             public byte execute(){
-                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte val = (byte) (cpu.bus.cpuRead( (operand1 << 8 ) + operand2 ) + 1);
+                int address = cpu.getAbsolute();
+                byte val = (byte) (cpu.bus.cpuRead(address ) + 1);
                 updateDEC_INC_EOR_Flags( val  );
-                cpu.bus.cpuWrite( (operand1 << 8 ) + operand2 , val);
-                printASM("INC " +  Integer.toHexString((operand1 << 8 ) + operand2));
+                cpu.bus.cpuWrite( address , val);
+                printASM("INC A " +  Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -862,12 +834,11 @@ public class ISA {
         opcodes.put(0xFE,new Opcode((byte)7){
             @Override
             public byte execute(){
-                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte val = (byte) (cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexX) + 1) ;
+                int address = cpu.getAbsoluteX();
+                byte val = (byte) (cpu.bus.cpuRead( address) + 1) ;
                 updateDEC_INC_EOR_Flags( val  );
-                cpu.bus.cpuWrite( (operand1 << 8 ) + operand2 + cpu.indexX, val);
-                printASM("INC " +  Integer.toHexString((operand1 << 8 ) + operand2) + ", X");
+                cpu.bus.cpuWrite(address, val);
+                printASM("INC Ax " +  Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -877,15 +848,10 @@ public class ISA {
         opcodes.put(0x41, new Opcode((byte)6){
             @Override
             public byte execute(){
-                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
-                int ptr = (operand + cpu.indexX) & 0xFF;
-                byte low = cpu.bus.cpuRead(ptr);
-                byte high = cpu.bus.cpuRead(ptr+1);
-                ptr = (high << 8 ) + low;
-
+                int ptr = cpu.getIndirectX();
                 cpu.accumulator = (byte) (cpu.accumulator ^ cpu.bus.cpuRead(ptr));
                 updateDEC_INC_EOR_Flags(cpu.accumulator);
-                printASM("EOR $"+ Integer.toHexString(operand) + " ,X");
+                printASM("EOR Ix "+ Integer.toHexString(ptr));
                 return (byte)cycle;
             }
         });
@@ -893,10 +859,10 @@ public class ISA {
         opcodes.put(0x45, new Opcode((byte)3){
             @Override
             public byte execute(){
-                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
+                byte operand = cpu.getZeroPage();
                 cpu.accumulator = (byte) (cpu.bus.cpuRead(operand) ^ cpu.accumulator);
                 updateDEC_INC_EOR_Flags(cpu.accumulator);
-                printASM("EOR $" + Integer.toHexString(operand));
+                printASM("EOR Z " + Integer.toHexString(operand));
                 return (byte)cycle;
             }
         });
@@ -907,7 +873,7 @@ public class ISA {
                 byte operand = cpu.bus.cpuRead(cpu.programCounter++);
                 cpu.accumulator = (byte) (operand ^ cpu.accumulator);
                 updateDEC_INC_EOR_Flags(cpu.accumulator);
-                printASM("EOR #" + Integer.toHexString(operand));
+                printASM("EOR " + Integer.toHexString(operand));
                 return (byte)cycle;
             }
         });
@@ -915,11 +881,10 @@ public class ISA {
         opcodes.put(0x4D, new Opcode((byte)4){
             @Override
             public byte execute(){
-                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                cpu.accumulator = (byte) (cpu.bus.cpuRead( (operand1 << 8 ) + operand2 ) ^ cpu.accumulator) ;
+                int address = cpu.getAbsolute();
+                cpu.accumulator = (byte) (cpu.bus.cpuRead( address ) ^ cpu.accumulator) ;
                 updateDEC_INC_EOR_Flags(cpu.accumulator);
-                printASM("EOR $" + Integer.toHexString((operand1 << 8 ) + operand2 ));
+                printASM("EOR A " + Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -927,14 +892,11 @@ public class ISA {
         opcodes.put(0x51, new Opcode((byte)5){
             @Override
             public byte execute(){
-                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
-                byte low = cpu.bus.cpuRead(operand);
-                byte high = cpu.bus.cpuRead(operand+1);
-                int ptr = ( (high << 8 ) + low ) + cpu.indexY;
+                int ptr = cpu.getIndirectY();
 
                 cpu.accumulator = (byte) (cpu.accumulator ^ cpu.bus.cpuRead(ptr));
                 updateDEC_INC_EOR_Flags(cpu.accumulator);
-                printASM("EOR $"+ Integer.toHexString(operand) + " ,Y");
+                printASM("EOR Iy "+ Integer.toHexString(ptr));
                 return (byte)cycle;
             }
         });
@@ -942,10 +904,10 @@ public class ISA {
         opcodes.put(0x55, new Opcode((byte)4){
             @Override
             public byte execute(){
-                byte operand = cpu.bus.cpuRead(cpu.programCounter++);
-                cpu.accumulator = (byte) (cpu.bus.cpuRead(  operand + cpu.indexX ) ^ cpu.accumulator) ;
+                int address = cpu.getZeroPageX();
+                cpu.accumulator = (byte) (cpu.bus.cpuRead(  address ) ^ cpu.accumulator) ;
                 updateDEC_INC_EOR_Flags(cpu.accumulator);
-                printASM("EOR $" + Integer.toHexString(operand + cpu.indexX ) + " ,X");
+                printASM("EOR Zx " + Integer.toHexString(address ));
                 return (byte)cycle;
             }
         });
@@ -953,11 +915,10 @@ public class ISA {
         opcodes.put(0x59, new Opcode((byte)4){
             @Override
             public byte execute(){
-                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                cpu.accumulator = (byte) (cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexX) ^ cpu.accumulator) ;
+                int address = cpu.getAbsoluteY();
+                cpu.accumulator = (byte) (cpu.bus.cpuRead(address) ^ cpu.accumulator) ;
                 updateDEC_INC_EOR_Flags( cpu.accumulator  );
-                printASM("EOR $" +  Integer.toHexString((operand1 << 8 ) + operand2) + ", X");
+                printASM("EOR Ay " +  Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -965,11 +926,10 @@ public class ISA {
         opcodes.put(0x5D, new Opcode((byte)4){
             @Override
             public byte execute(){
-                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                cpu.accumulator = (byte) (cpu.bus.cpuRead( (operand1 << 8 ) + operand2 + cpu.indexY) ^ cpu.accumulator) ;
+                int address = cpu.getAbsoluteX();
+                cpu.accumulator = (byte) (cpu.bus.cpuRead(address) ^ cpu.accumulator) ;
                 updateDEC_INC_EOR_Flags( cpu.accumulator  );
-                printASM("EOR $" +  Integer.toHexString((operand1 << 8 ) + operand2) + ", Y");
+                printASM("EOR Ax " +  Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -979,10 +939,8 @@ public class ISA {
         opcodes.put(0x4C, new Opcode((byte)3){
             @Override
             public byte execute(){
-                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                cpu.programCounter = (operand1 << 8) + operand2;
-                printASM("JMP #" + Integer.toHexString(cpu.programCounter));
+                cpu.programCounter = cpu.getAbsolute();
+                printASM("JMP A " + Integer.toHexString(cpu.programCounter));
                 return (byte)cycle;
             }
         });
@@ -990,10 +948,8 @@ public class ISA {
         opcodes.put(0x6C, new Opcode((byte)5){
             @Override
             public byte execute(){
-                byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
-                byte operand1 = cpu.bus.cpuRead(cpu.programCounter++);
-                cpu.programCounter = ( cpu.bus.cpuRead(operand1) << 8 )  + cpu.bus.cpuRead(operand2);
-                printASM("JMP $" + Integer.toHexString(cpu.programCounter));
+                cpu.programCounter = cpu.getIndirect();
+                printASM("JMP I " + Integer.toHexString(cpu.programCounter));
                 return (byte)cycle;
             }
         });
@@ -1003,12 +959,10 @@ public class ISA {
     opcodes.put(0x29, new Opcode((byte)6){
         @Override
         public byte execute(){
-            byte operand2 = cpu.bus.cpuRead(cpu.programCounter++);
-            byte operand1 = cpu.bus.cpuRead(cpu.programCounter);
-
-            cpu.pushPCToStack();
-            cpu.programCounter = ( cpu.bus.cpuRead(operand1) << 8 )  + cpu.bus.cpuRead(operand2);
-            printASM("JSR #" + Integer.toHexString(cpu.programCounter));
+            int address = cpu.getAbsolute();
+            cpu.pushAddressToStack(cpu.programCounter - 1);
+            cpu.programCounter = address;
+            printASM("JSR A " + Integer.toHexString(cpu.programCounter));
             return (byte)cycle;
         }   
     });
@@ -1038,7 +992,36 @@ public class ISA {
             return (byte)cycle;
         }
     });
-    //LDA, LDX, LDY, LSR, ORA, PHA, PHP, PLA, PLP, ROL, ROR, SBC, SEC, SED, SEI, STA, STX, STY, 
+
+    //-----------------------
+    //STA
+    opcodes.put(0x85,new Opcode((byte)3) {
+        @Override
+        public byte execute(){
+            int address = cpu.getZeroPage();
+            cpu.bus.cpuWrite(address,cpu.accumulator);
+            printASM("STA Z "+Integer.toHexString(address));
+            return (byte)cycle;
+        }
+    });
+
+
+    //-----------------------
+    //STX
+
+    //-----------------------
+    //STY
+
+    //-----------------------
+    //LDA
+
+    //-----------------------
+    //LDX
+
+    //-----------------------
+    //LDY
+
+    //LSR, ORA, PHA, PHP, PLA, PLP, ROL, ROR, SBC, SEC, SED, SEI, 
     //TAX, TAY, TSX, TXA, TXS, TYA
     }
 }

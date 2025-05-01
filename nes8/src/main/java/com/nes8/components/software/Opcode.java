@@ -12,5 +12,5 @@ public abstract class Opcode {
     }
     public void printASM(String code){
         if(Settings.DISASSEMBLE_ASM) System.out.println(code);
-    }
+    } 
 } 
