@@ -10,7 +10,7 @@ public class Bus{
 
     public ROM rom ;
     private RAM ram;
-    CPU cpu;
+    public CPU cpu;
     PPU ppu;
     APU apu;
     Controller controller;
@@ -56,6 +56,7 @@ public class Bus{
             ram.write(address & 0x07FF, value);// Mirrored every 2KB
         }
         else if(address >= 0x2000 && address <= 0x3FFF){
+            System.out.println("PPU registers written");
             ppu.registers[(address - 0x2000 ) & 0x7] = value;// mirrored every 8 bytes
         }
         else if((address >= 0x4000 && address <= 0x4013) || address == 0x4015 || address == 0x4017){

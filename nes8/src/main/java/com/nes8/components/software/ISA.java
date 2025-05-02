@@ -570,15 +570,7 @@ public class ISA {
         opcodes.put((byte)0x00,new Opcode((byte)7){
             @Override
             public byte execute(){
-                // TODO: IRQ
-
-                cpu.programCounter ++;
-                cpu.pushAddressToStack(cpu.programCounter);
-                cpu.updateFlag(Flag.I, true);
-                cpu.stackPush(cpu.statusRegister );
-                cpu.updateFlag(Flag.I, false);// ?? is this needed
-
-                cpu.programCounter = (short)((cpu.bus.cpuRead(0xFFFF) << 8 ) | (cpu.bus.cpuRead(0xFFFE)));
+                cpu.IRQ();
                 printASM("BRK" );
                 return (byte)cycle;
             }

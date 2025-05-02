@@ -15,5 +15,5 @@ public class Settings {
 
     public static float GAME_SPEED = 1f;
 
-    public static boolean DISASSEMBLE_ASM = false;
+    public static boolean DISASSEMBLE_ASM = true;
 }

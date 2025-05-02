@@ -55,6 +55,7 @@ public class PPU {
             case 0x2001:// PPUMASK
             break;
             case 0x2002:// PPUSTATUS
+            if((data & 0x80 ) == 0x80) bus.cpu.NMI();
             break;
             case 0x2004:// OAMDATA
             oam.write(registers[3], data); 
@@ -66,6 +67,14 @@ public class PPU {
             nt.write(registers[6], data);
             break;
         }
+    }
+
+    public int getVRAMOffsetForBackground(){
+        return (registers[2] & 16 ) == 16  ? 0x1000 : 0x0000;
+    } 
+
+    public int getVRAMOffsetForForeground(){
+        return (registers[2] & 8 ) == 8  ? 0x1000 : 0x0000;
     }
 
     private void cycle(int cycles) throws InterruptedException{

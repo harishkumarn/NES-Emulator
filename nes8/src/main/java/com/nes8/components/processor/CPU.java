@@ -3,7 +3,7 @@ package com.nes8.components.processor;
 import com.nes8.Settings;
 import com.nes8.components.software.ISA;
 import com.nes8.graphics.ObjectAttributeMemory;
-import java.util.Stack;
+import java.util.concurrent.locks.ReentrantLock;
 
 import com.nes8.components.DMA;
 import com.nes8.components.bus.Bus;
@@ -16,7 +16,7 @@ import com.nes8.components.bus.Bus;
 
 public class CPU{
     // Registers
-    public int programCounter =  0x8000;
+    public int programCounter ;
     public byte stackPointer = (byte)0xFD; 
     public byte statusRegister = 0;
     public byte indexX = 0;
@@ -24,6 +24,9 @@ public class CPU{
     public byte accumulator = 0 ;
 
     private int byteCodeLastAddress ;
+    
+    // Used for NMI
+    private ReentrantLock lock = new ReentrantLock();
 
     public enum Flag{
         C(1<<7), // Carry Flag
@@ -52,8 +55,41 @@ public class CPU{
 
     public CPU(Bus bus, int pgr_rom_size){
         this.bus = bus;
-        this.byteCodeLastAddress = this.programCounter + pgr_rom_size;
         bus.setCPU(this);
+        reset();
+        this.byteCodeLastAddress = this.programCounter + pgr_rom_size;
+    }
+
+    public void reset(){
+        byte low = bus.cpuRead(0xFFFC);
+        byte high = bus.cpuRead(0xFFFD);
+        this.programCounter = (high << 8) + low;
+    }
+
+    public void IRQ(){
+        if(getFlag(Flag.I) == 0 ) return;
+        pushAddressToStack(programCounter);
+        updateFlag(Flag.I, true);
+        stackPush((byte)(statusRegister | 0x20));
+        updateFlag(Flag.I, false);// ?? is this needed
+        byte low = bus.cpuRead(0xFFFE);
+        byte high = bus.cpuRead(0xFFFF);
+        programCounter = (high<<8) + low;
+    }
+
+    public void NMI(){
+        lock.lock();
+        byte low, high;
+        high = (byte)( ( programCounter >> 8 ) & 0xFF );
+        low = (byte)( programCounter & 0xFF); 
+        stackPush(high);
+        stackPush(low);
+        stackPush((byte)(statusRegister | 0x20));
+        updateFlag(Flag.I, true);
+        low = bus.cpuRead(0xFFFA);
+        high = bus.cpuRead(0xFFFB);
+        programCounter = (high<<8) + low;
+        lock.unlock();
     }
 
     private void cycle(byte cycles) throws InterruptedException{
@@ -65,11 +101,13 @@ public class CPU{
     public void interpret() throws InterruptedException{
         try{
             while(programCounter <= this.byteCodeLastAddress){
+                lock.lock();
                 int pc = programCounter;
                 byte inst = bus.cpuRead(programCounter++);
                 if(Settings.DISASSEMBLE_ASM) System.out.print(Integer.toHexString(pc) + "    ");
                 byte cycles = isa.getOpcode(inst).execute();
                 cycle(cycles);
+                lock.unlock();
             }
         }catch(Exception e){
             e.printStackTrace();

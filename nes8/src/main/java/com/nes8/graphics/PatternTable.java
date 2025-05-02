@@ -28,23 +28,27 @@ public class PatternTable {
     }
 
     public void init(int address){
+        for(int j = 0 ; j < 128;j += 8){
+            for(int i = 0 ; i < 128; i += 8  ){
+                renderTile(i,j, address, Pallete.PATTERN_TABLE_COLORS);
+                address += 16;
+            }
+        }
+    }
+
+    public void renderTile(int i, int j, int address, Color[] pallColors){
         byte[] lowByte = new byte[8], highByte = new byte[8];
         int x,y, c;
-       
-        for(int j = 0 ; j < 128;j+=8){
-            for(int i = 0 ; i < 128; i+= 8  ){
-                for(int k = 0; k < 8;++k) lowByte[k] = bus.ppuRead(address++);//plane 1
-                for(int k = 0; k < 8;++k) highByte[k] = bus.ppuRead(address++);//plane 2
-                for(int k = 0; k < 8;++k){
-                    for(int l = 7; l >= 0;--l){
-                        x = i + ( 7 - l );
-                        y = j + k ;
-                        c = 0 ;
-                        if((highByte[k] & ( 1<< l)) > 0 ) c = 2;
-                        if((lowByte[k] & ( 1<< l)) > 0) c += 1;
-                        pt[x][y] = Pallete.PATTERN_TABLE_COLORS[c];
-                    }
-                }
+        for(int k = 0; k < 8;++k) lowByte[k] = bus.ppuRead(address++);//plane 1
+        for(int k = 0; k < 8;++k) highByte[k] = bus.ppuRead(address++);//plane 2
+        for(int k = 0; k < 8;++k){
+            for(int l = 7; l >= 0;--l){
+                x = i + ( 7 - l );
+                y = j + k ;
+                c = 0 ;
+                if((highByte[k] & ( 1<< l)) > 0 ) c = 2;
+                if((lowByte[k] & ( 1<< l)) > 0) c += 1;
+                pt[x][y] = pallColors[c];
             }
         }
     }
