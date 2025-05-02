@@ -12,7 +12,7 @@ public class OutputBuffer {
     
     Display display;
 
-    Color[][] outputBuffer;
+    public Color[][] outputBuffer;
 
     public OutputBuffer(){
         this.outputBuffer = new Color[DISPLAY_HEIGHT][DISPLAY_WIDTH];

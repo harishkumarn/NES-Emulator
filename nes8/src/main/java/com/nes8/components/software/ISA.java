@@ -51,6 +51,17 @@ public class ISA {
         cpu.updateFlag(Flag.N,  (val & 0x80) > 0 );
     }
 
+    public void BRK(){
+        cpu.programCounter ++; 
+        cpu.pushAddressToStack(cpu.programCounter);
+        cpu.stackPush((byte)(cpu.statusRegister | 0x20));
+        cpu.updateFlag(Flag.I, true);
+        byte low = cpu.bus.cpuRead(0xFFFE);
+        byte high = cpu.bus.cpuRead(0xFFFF);
+        cpu.programCounter =( (high<<8) | low ) & 0xFFFF;
+    }
+
+
     private void SBC(byte value){
         int result = cpu.accumulator - value - 1 + cpu.getFlag(Flag.C);
         int unsigned = result & 0xFF;
@@ -570,7 +581,7 @@ public class ISA {
         opcodes.put((byte)0x00,new Opcode((byte)7){
             @Override
             public byte execute(){
-                cpu.IRQ();
+                BRK();
                 printASM("BRK" );
                 return (byte)cycle;
             }
@@ -1008,7 +1019,7 @@ public class ISA {
         public byte execute(){
             byte low = cpu.stackPop();
             byte high = cpu.stackPop();
-            cpu.programCounter = ((high << 8 ) + low) + 1;
+            cpu.programCounter = (((high << 8 ) | low) & 0xFFFF ) + 1;
             printASM("RTS");
             return (byte)cycle;
         }
@@ -1022,7 +1033,7 @@ public class ISA {
             cpu.statusRegister = cpu.stackPop();
             byte low = cpu.stackPop();
             byte high = cpu.stackPop();
-            cpu.programCounter = (high << 8) + low;
+            cpu.programCounter = ((high << 8) | low ) & 0xFFFF;
             printASM("RTI");
             return (byte)cycle;
         }

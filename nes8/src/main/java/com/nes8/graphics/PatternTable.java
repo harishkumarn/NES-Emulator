@@ -30,13 +30,17 @@ public class PatternTable {
     public void init(int address){
         for(int j = 0 ; j < 128;j += 8){
             for(int i = 0 ; i < 128; i += 8  ){
-                renderTile(i,j, address, Pallete.PATTERN_TABLE_COLORS);
+                renderTile(i,j, address, pt,Pallete.PATTERN_TABLE_COLORS);
                 address += 16;
             }
         }
     }
 
-    public void renderTile(int i, int j, int address, Color[] pallColors){
+    public void renderSprite(int i, int j, int priority, boolean horizontalFlip, boolean verticalFlip,Color[][] display, Color[] pallColors){
+
+    }
+
+    public void renderTile(int i, int j, int address, Color[][] display,Color[] pallColors){
         byte[] lowByte = new byte[8], highByte = new byte[8];
         int x,y, c;
         for(int k = 0; k < 8;++k) lowByte[k] = bus.ppuRead(address++);//plane 1
@@ -48,7 +52,7 @@ public class PatternTable {
                 c = 0 ;
                 if((highByte[k] & ( 1<< l)) > 0 ) c = 2;
                 if((lowByte[k] & ( 1<< l)) > 0) c += 1;
-                pt[x][y] = pallColors[c];
+                display[x][y] = pallColors[c];
             }
         }
     }

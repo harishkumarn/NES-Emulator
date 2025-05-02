@@ -63,18 +63,7 @@ public class CPU{
     public void reset(){
         byte low = bus.cpuRead(0xFFFC);
         byte high = bus.cpuRead(0xFFFD);
-        this.programCounter = (high << 8) + low;
-    }
-
-    public void IRQ(){
-        if(getFlag(Flag.I) == 0 ) return;
-        pushAddressToStack(programCounter);
-        updateFlag(Flag.I, true);
-        stackPush((byte)(statusRegister | 0x20));
-        updateFlag(Flag.I, false);// ?? is this needed
-        byte low = bus.cpuRead(0xFFFE);
-        byte high = bus.cpuRead(0xFFFF);
-        programCounter = (high<<8) + low;
+        this.programCounter = ((high << 8)  | low ) & 0xFFFF;
     }
 
     public void NMI(){
@@ -88,8 +77,19 @@ public class CPU{
         updateFlag(Flag.I, true);
         low = bus.cpuRead(0xFFFA);
         high = bus.cpuRead(0xFFFB);
-        programCounter = (high<<8) + low;
+        programCounter = ((high<<8) | low ) & 0xFFFF;
         lock.unlock();
+    }
+
+    public void IRQ(){
+        if(getFlag(Flag.I) == 1) return;
+        programCounter ++; 
+        pushAddressToStack(programCounter);
+        stackPush((byte)(statusRegister | 0x20));
+        updateFlag(Flag.I, true);
+        byte low = bus.cpuRead(0xFFFE);
+        byte high = bus.cpuRead(0xFFFF);
+        programCounter = ((high<<8) | low ) & 0xFFFF;
     }
 
     private void cycle(byte cycles) throws InterruptedException{
@@ -104,7 +104,7 @@ public class CPU{
                 lock.lock();
                 int pc = programCounter;
                 byte inst = bus.cpuRead(programCounter++);
-                if(Settings.DISASSEMBLE_ASM) System.out.print(Integer.toHexString(pc) + "    ");
+                if(Settings.DISASSEMBLE_ASM) System.out.print("0x" + Integer.toHexString(pc) + "    ");
                 byte cycles = isa.getOpcode(inst).execute();
                 cycle(cycles);
                 lock.unlock();
@@ -159,32 +159,32 @@ public class CPU{
     public int getAbsolute(){
         byte low = bus.cpuRead(programCounter++);
         byte high = bus.cpuRead(programCounter++);
-        return bus.cpuRead( (high << 8 )+ low) ;
+        return bus.cpuRead( (high << 8 ) | low) & 0xFFFF;
     }
 
     public int getAbsoluteX(){
         byte low = bus.cpuRead(programCounter++);
         byte high = bus.cpuRead(programCounter++);
-        int address =  ((high << 8 )+ low + indexX) & 0xFFFF;
+        int address =  (((high << 8 ) | low )+ indexX) & 0xFFFF;
         return address;
     }
 
     public int getAbsoluteY(){
         byte low = bus.cpuRead(programCounter++);
         byte high = bus.cpuRead(programCounter++);
-        int address =  ((high << 8 )+ low + indexY) & 0xFFFF;
+        int address =  (((high << 8 ) | low ) + indexY) & 0xFFFF;
         return address;
     }
 
     public int getIndirect(){
        byte low = bus.cpuRead(programCounter++);
        byte high = bus.cpuRead(programCounter++);
-       int address =  ((high << 8) + low ) & 0xFFFF;
+       int address =  ((high << 8) | low ) & 0xFFFF;
        low  = bus.cpuRead(address);
        
        //TODO: verify the following line once again
        high = bus.cpuRead((address & 0xFF00) | ((address + 1) & 0xFF));
-       address =  ((high << 8) + low ) & 0xFFFF;
+       address =  ((high << 8) | low ) & 0xFFFF;
        return address;
     }
 
@@ -192,7 +192,7 @@ public class CPU{
         int address = getZeroPageX();
         byte low = bus.cpuRead(address);
         byte high = bus.cpuRead(address+1);
-        address = ((high << 8 ) + low ) & 0xFFFF;
+        address = ((high << 8 ) | low ) & 0xFFFF;
         return address;
     }
 
@@ -200,7 +200,7 @@ public class CPU{
         int address = getZeroPage();
         byte low = bus.cpuRead(address);
         byte high = bus.cpuRead(address+1);
-        address = ((high << 8 ) + low  + indexY) & 0xFFFF;
+        address = ((high << 8 ) | low  + indexY) & 0xFFFF;
         return address;
     }
 
