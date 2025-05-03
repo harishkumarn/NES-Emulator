@@ -22,9 +22,17 @@ public class ISA {
         this.cpu = cpu;
         initOpcodes();
     }
+  
+    private Opcode notImplemented = new Opcode((byte)1){
+         @Override
+         public byte execute(){
+            printASM("NOT IMPLEMENTED : " + Integer.toHexString(cpu.bus.cpuRead(cpu.programCounter - 1) & 0xFF));
+            return (byte)cycle;
+         }
+    } ;
 
     public Opcode getOpcode(byte inst){
-        return opcodes.get(inst);
+        return opcodes.getOrDefault(inst, notImplemented);
     }
 
     private void updateADCFlags(byte a, byte o, byte c){
@@ -60,7 +68,6 @@ public class ISA {
         byte high = cpu.bus.cpuRead(0xFFFF);
         cpu.programCounter =( (high<<8) | low ) & 0xFFFF;
     }
-
 
     private void SBC(byte value){
         int result = cpu.accumulator - value - 1 + cpu.getFlag(Flag.C);
@@ -1804,5 +1811,53 @@ public class ISA {
             return (byte)cycle;
         }
     }); 
+    //UNDOCUMENTED 6502 Opcoded are implemented below
+    //NOP ( Absolute )
+    opcodes.put((byte)0x0C, new Opcode((byte)4){
+        @Override
+        public byte execute(){
+            cpu.programCounter += 2;
+            printASM("NOP A");
+            return (byte)cycle;
+        }
+    });
+    opcodes.put((byte)0x1A, new Opcode((byte)2){
+        @Override
+        public byte execute(){
+            printASM("NOP");
+            return (byte)cycle;
+        }
+    });
+    opcodes.put((byte)0x1C, new Opcode((byte)4){
+        @Override
+        public byte execute(){
+            cpu.programCounter += 2;
+            printASM("NOP Ax");
+            return (byte)cycle;
+        }
+    });
+    opcodes.put((byte)0x80, new Opcode((byte)2){
+        @Override
+        public byte execute(){
+            cpu.programCounter += 1;
+            printASM("NOP I");
+            return (byte)cycle;
+        }
+    });
+    //SLO
+    opcodes.put((byte)0x1B, new Opcode((byte)7){
+        @Override
+        public byte execute(){
+            int address = cpu.getAbsoluteY();
+            byte value = cpu.bus.cpuRead(address);
+            boolean carry = (value & 0x80) == 0x80;
+            cpu.updateFlag(Flag.C, carry); 
+            value <<= 1;
+            cpu.accumulator |= value;
+            updateZNFlags(cpu.accumulator);
+            printASM("SLO");
+            return (byte)cycle;
+        }
+    });
     }
 }

@@ -8,7 +8,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import com.nes8.components.DMA;
 import com.nes8.components.bus.Bus;
 
-
 /**
  * This is an attempt to emulate the 6502, I'm pretty sure this is ridden with errors in many instructions :p
  * Memory range : 0x0000 to 0xFFFF
@@ -99,11 +98,12 @@ public class CPU{
 
 
     public void interpret() throws InterruptedException{
+        byte inst = (byte)0;
         try{
             while(programCounter <= this.byteCodeLastAddress){
                 lock.lock();
                 int pc = programCounter;
-                byte inst = bus.cpuRead(programCounter++);
+                inst = bus.cpuRead(programCounter++);
                 if(Settings.DISASSEMBLE_ASM) System.out.print("0x" + Integer.toHexString(pc) + "    ");
                 byte cycles = isa.getOpcode(inst).execute();
                 cycle(cycles);
@@ -111,6 +111,7 @@ public class CPU{
             }
         }catch(Exception e){
             e.printStackTrace();
+            System.out.println(inst);
         }
     }
 
@@ -159,7 +160,7 @@ public class CPU{
     public int getAbsolute(){
         byte low = bus.cpuRead(programCounter++);
         byte high = bus.cpuRead(programCounter++);
-        return bus.cpuRead( (high << 8 ) | low) & 0xFFFF;
+        return  ((high << 8 ) | low) & 0xFFFF;
     }
 
     public int getAbsoluteX(){

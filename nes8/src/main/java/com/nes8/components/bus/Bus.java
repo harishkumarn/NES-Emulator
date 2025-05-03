@@ -53,6 +53,7 @@ public class Bus{
 
     public void cpuWrite(int address, byte value){
         if(address >= 0x0000 && address <= 0x1FFF){
+            System.out.println("RAM write " + Integer.toHexString(address));
             ram.write(address & 0x07FF, value);// Mirrored every 2KB
         }
         else if(address >= 0x2000 && address <= 0x3FFF){
@@ -60,16 +61,20 @@ public class Bus{
             ppu.registers[(address - 0x2000 ) & 0x7] = value;// mirrored every 8 bytes
         }
         else if((address >= 0x4000 && address <= 0x4013) || address == 0x4015 || address == 0x4017){
+            System.out.println("APU write");
             apu.write(address, value);
         }else if(address == 0x4014){
+            System.out.println("DMA transfer");
             DMA.startDMATransfer(value, ram, ppu);
         }
         else if(address == 0x4016 ){
             if(value == 1){
+                System.out.println("Controller write");
                 controller.loadShiftRegisters();
             }
         }
         else if(address >= 4020 && address <= 0xFFFF){
+            System.out.println("ROM write");
             rom.mmc.write(address, value);
         }   
     }

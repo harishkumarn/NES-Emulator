@@ -16,7 +16,7 @@ import com.nes8.components.helper.Display;
 public class Pallete {
     public static final Color[] PATTERN_TABLE_COLORS = new Color[]{Color.BLACK, Color.WHITE, Color.BLUE, Color.GRAY};
 
-    private static final Color[] pallete = new Color[]{
+    public static final Color[] pallete = new Color[]{
         new Color(124, 124, 124), new Color(0, 0, 252),     new Color(0, 0, 188),     new Color(68, 40, 188),
         new Color(148, 0, 132),   new Color(168, 0, 32),    new Color(168, 16, 0),    new Color(136, 20, 0),
         new Color(80, 48, 0),     new Color(0, 120, 0),     new Color(0, 104, 0),     new Color(0, 88, 0),
@@ -60,8 +60,8 @@ public class Pallete {
         Display.init(16*8, 32, Settings.PT_SCALE, screen, "Pallete");
     }
 
-    private byte[][] backGround = new byte[4][4];
-    private byte[][] foreGround = new byte[4][4];
+    public byte[][] backGround = new byte[4][4];
+    public byte[][] foreGround = new byte[4][4];
 
     public void updatePalette(int address, byte index){
         // ppuRead will return the address after masking the mirrorred address
@@ -74,6 +74,7 @@ public class Pallete {
         }
     }
 
+    @Deprecated
     public byte readPallete(int address){
         // ppuRead will return the address after masking the mirrorred address
         if(address >= 0x3F00 && address <= 0x3F0F){
