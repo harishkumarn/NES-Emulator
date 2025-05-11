@@ -47,8 +47,6 @@ public class CPU{
 
     // Components
     public Bus bus;
-    DMA dma = new DMA();
-    ObjectAttributeMemory oam = new ObjectAttributeMemory();
     ISA isa = new ISA(this);
 
 
@@ -102,16 +100,15 @@ public class CPU{
         try{
             while(programCounter <= this.byteCodeLastAddress){
                 lock.lock();
-                int pc = programCounter;
+                if(Settings.DISASSEMBLE_ASM) System.out.print("0x" + Integer.toHexString(programCounter) + "    ");
                 inst = bus.cpuRead(programCounter++);
-                if(Settings.DISASSEMBLE_ASM) System.out.print("0x" + Integer.toHexString(pc) + "    ");
                 byte cycles = isa.getOpcode(inst).execute();
                 cycle(cycles);
                 lock.unlock();
             }
         }catch(Exception e){
             e.printStackTrace();
-            System.out.println(inst);
+            System.out.println(Integer.toHexString(inst));
         }
     }
 

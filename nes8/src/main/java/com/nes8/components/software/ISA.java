@@ -62,7 +62,7 @@ public class ISA {
     public void BRK(){
         cpu.programCounter ++; 
         cpu.pushAddressToStack(cpu.programCounter);
-        cpu.stackPush((byte)(cpu.statusRegister | 0x20));
+        cpu.stackPush((byte)(cpu.statusRegister | 0x4));
         cpu.updateFlag(Flag.I, true);
         byte low = cpu.bus.cpuRead(0xFFFE);
         byte high = cpu.bus.cpuRead(0xFFFF);

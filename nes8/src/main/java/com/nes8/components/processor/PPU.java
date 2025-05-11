@@ -17,7 +17,7 @@ public class PPU {
     static int[][] tileQuadrantMapping = new int[][]{{0,1,2,3}};
 
     PatternTable pt1, pt2 ;
-    public NameTable nt;    
+    public NameTable nt =  new NameTable();    
     public Pallete pallete = new Pallete();
     public ObjectAttributeMemory oam  = new ObjectAttributeMemory();
     OutputBuffer gui ;
@@ -59,22 +59,33 @@ public class PPU {
         }
     }
 
+    public byte read(int registerIndex){
+        if(registerIndex == 2){
+            if(registers[2] < 0) registers[2]  ^= 0x80;
+        }
+
+        return registers[registerIndex];
+    }
+
     public void write(int address, byte data){
-        registers[address - 0x2000] = data;
+        if(address >= 0x2000 && address <= 0x3FFF){
+            address = (address - 0x2000 ) & 0x7;
+        }
+        registers[address ] = data;
         switch(address ){
-            case 0x2000:// PPUCTRL
+            case 0:// PPUCTRL
             break;
-            case 0x2001:// PPUMASK
+            case 1:// PPUMASK
             break;
-            case 0x2002:// PPUSTATUS
+            case 2:// PPUSTATUS
             if((data & 0x80 ) == 0x80) bus.cpu.NMI();
             break;
-            case 0x2004:// OAMDATA
+            case 4:// OAMDATA
             oam.write(registers[3], data); 
             break;
-            case 0x2005:// PPUSCROLL
+            case 5:// PPUSCROLL
             break;
-            case 0x2007:// PPUDATA
+            case 7:// PPUDATA
             System.out.println("Nametable init");
             nt.write(registers[6], data);
             break;
@@ -82,12 +93,12 @@ public class PPU {
     }
 
     public int getPTOffsetForBackground(){
-        return (registers[2] & 16 ) == 16  ? 0x1000 : 0x0000;
+        return (registers[0] & 16 ) == 16  ? 0x1000 : 0x0000;
     } 
 
 
     public int getPTOffsetForForeground(){
-        return (registers[2] & 8 ) == 8  ? 0x1000 : 0x0000;
+        return (registers[0] & 8 ) == 8  ? 0x1000 : 0x0000;
     }
 
     public int getVRAMOffset(){
@@ -111,10 +122,13 @@ public class PPU {
         switch(tileQuadrantMapping[(j % 4 ) / 2][(i % 4 ) /2]){
             case 0:
             pIndex = (data >> 6) & 3;
+            break;
             case 1:
             pIndex = (data >> 4) & 3;
+            break;
             case 2:
             pIndex = (data >> 2) & 3;
+            break;
             default:
             pIndex = data & 3;
         }

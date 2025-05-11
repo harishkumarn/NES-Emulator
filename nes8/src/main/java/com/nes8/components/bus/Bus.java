@@ -26,7 +26,7 @@ public class Bus{
             res = ram.read(address & 0x07FF);// Mirrored every 2KB
         }
         else if(address >= 0x2000 && address <= 0x3FFF){
-            res = ppu.registers[(address - 0x2000 ) & 0x7];// mirrored every 8 bytes
+            res = ppu.read((address - 0x2000 ) & 0x7);// mirrored every 8 bytes
         }
         else if( address == 0x4015){
             res =  apu.getStatusRegister();
@@ -43,7 +43,7 @@ public class Bus{
         if(address >= 0x0000 && address <= 0x1FFF){
             return rom.mmc.read(address);
         }else if(address >= 0x2000 && address <= 0x3EFF){
-            return ppu.nt.vram[(address - 0x2000 ) & 0x7FF];// Mirrored every 2KB
+            return ppu.nt.read((address - 0x2000 ) & 0x7FF);// Mirrored every 2KB
         }else if(address >=0x3F00 && address <= 0x3FFF ){
             // TODO : Handle mirrors
             return ppu.pallete.readPallete(address);
@@ -53,12 +53,11 @@ public class Bus{
 
     public void cpuWrite(int address, byte value){
         if(address >= 0x0000 && address <= 0x1FFF){
-            System.out.println("RAM write " + Integer.toHexString(address));
             ram.write(address & 0x07FF, value);// Mirrored every 2KB
         }
         else if(address >= 0x2000 && address <= 0x3FFF){
-            System.out.println("PPU registers written");
-            ppu.registers[(address - 0x2000 ) & 0x7] = value;// mirrored every 8 bytes
+            System.out.println("PPU registers written 0x" +  Integer.toHexString(address) + " " + value);
+            ppu.write(address, value);
         }
         else if((address >= 0x4000 && address <= 0x4013) || address == 0x4015 || address == 0x4017){
             System.out.println("APU write");
