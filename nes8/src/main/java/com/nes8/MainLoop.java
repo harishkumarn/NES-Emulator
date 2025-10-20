@@ -23,13 +23,17 @@ public class MainLoop
         new Thread( () -> {
                 try{
                     cpu.interpret();// 1.79 Mhz
-                }catch(Exception e){}
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
         }).start();
 
         new Thread( () -> {
                 try{
                     ppu.start();// 5.32 Mhz
-                }catch(Exception e){}
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
         }).start();
 
         new Thread(() -> {

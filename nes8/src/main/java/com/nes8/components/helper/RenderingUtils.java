@@ -5,6 +5,15 @@ import com.nes8.components.bus.Bus;
 
 
 public class RenderingUtils {
+    /**
+     * 
+     * @param i - vertical co-ordinate
+     * @param j - horizontal co-ordinate
+     * @param address
+     * @param display
+     * @param pallColors
+     * @param bus
+     */
     public static void renderTile(int i, int j, int address, Color[][] display,Color[] pallColors, Bus bus){ 
         if(pallColors == null || pallColors[0] == null) return;
         byte[] lowByte = new byte[8], highByte = new byte[8];
@@ -13,8 +22,8 @@ public class RenderingUtils {
         for(int k = 0; k < 8;++k) highByte[k] = bus.ppuRead(address++);//plane 2
         for(int k = 0; k < 8;++k){
             for(int l = 7; l >= 0;--l){
-                x = i + ( 7 - l );
-                y = j + k ;
+                y = i + ( 7 - l );
+                x = j + k ;
                 c = 0 ;
                 if((highByte[k] & ( 1<< l)) > 0 ) c = 2;
                 if((lowByte[k] & ( 1<< l)) > 0) c += 1;

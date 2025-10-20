@@ -16,6 +16,8 @@ public class PPU {
     Bus bus;
     static int[][] tileQuadrantMapping = new int[][]{{0,1,2,3}};
 
+    int patternTableAddress;
+
     PatternTable pt1, pt2 ;
     public NameTable nt =  new NameTable();    
     public Pallete pallete = new Pallete();
@@ -30,6 +32,7 @@ public class PPU {
         this.pt1 = new PatternTable(bus,"PT-1");
         this.pt2 = new PatternTable(bus,"PT-2");
         this.gui = new OutputBuffer(bus);
+        this.gui.initDisplay();
         bus.setPPU(this);
     }
 
@@ -56,6 +59,7 @@ public class PPU {
                 }
             }
             bus.cpu.NMI();
+            this.gui.rerender();
         }
     }
 
@@ -77,13 +81,17 @@ public class PPU {
             break;
             case 1:// PPUMASK
             break;
-            case 2:// PPUSTATUS
+            case 2:// PPUSTATUS. Can't write to the status register
             if((data & 0x80 ) == 0x80) bus.cpu.NMI();
+            break;
+            case 3:// OAMADDR
             break;
             case 4:// OAMDATA
             oam.write(registers[3], data); 
             break;
             case 5:// PPUSCROLL
+            break;
+            case 6:// PPUADDR
             break;
             case 7:// PPUDATA
             System.out.println("Nametable init");

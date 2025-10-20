@@ -45,10 +45,10 @@ public class Pallete {
     }
 
     public void renderPallete(){
-        Color[][] screen = new Color[16*8][4*8];
+        Color[][] screen = new Color[4*8][16*8];
         int pi = 0 ;
-        for(int i = 0 ; i < 16*8; i += 8){
-            for(int j = 0 ; j < 4*8 ; j += 8 ){
+        for(int i = 0 ; i < 4*8; i += 8){
+            for(int j = 0 ; j < 16*8 ; j += 8 ){
                 for(int x = 0 ; x < 8 ; ++x){
                     for(int y = 0;  y < 8 ;++y){
                         screen[i + x][j + y] = pallete[pi];
@@ -63,8 +63,13 @@ public class Pallete {
     public byte[][] backGround = new byte[4][4];
     public byte[][] foreGround = new byte[4][4];
 
+    /**
+     * Range 0x3F00 - 0X3F1F
+     * @param address
+     * @return
+     */
     public void updatePalette(int address, byte index){
-        // ppuRead will return the address after masking the mirrorred address
+        // ppuWrite will return the address after masking the mirrorred address
         if(address >= 0x3F00 && address <= 0x3F0F){
             int relative = address - 0x3F00;
             backGround[relative / 4][relative % 4 ] = index; 
@@ -74,7 +79,11 @@ public class Pallete {
         }
     }
 
-    @Deprecated
+    /**
+     * Range 0x3F00 - 0X3F1F
+     * @param address
+     * @return
+     */
     public byte readPallete(int address){
         // ppuRead will return the address after masking the mirrorred address
         if(address >= 0x3F00 && address <= 0x3F0F){

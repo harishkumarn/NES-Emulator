@@ -34,10 +34,10 @@ public class Display extends JPanel{
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        for (int x = 0; x < w; x++) {
-            for (int y = 0; y < h; y++) {
+        for (int x = 0; x < h; x++) {
+            for (int y = 0; y < w; y++) {
                 g.setColor(pixels[x][y]);
-                g.fillRect(x * scale, y * scale, scale, scale);
+                g.fillRect(y * scale, x * scale, scale, scale);
             }
         }
     }

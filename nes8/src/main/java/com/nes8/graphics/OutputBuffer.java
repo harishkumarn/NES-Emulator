@@ -26,6 +26,10 @@ public class OutputBuffer {
         this.display = Display.init(DISPLAY_WIDTH, DISPLAY_HEIGHT,Settings.DISPLAY_SCALE, outputBuffer, "NES8");
     }
 
+    public void rerender(){
+        this.display.rerender();
+    }
+
     public void setPixel(int i, int j, Color color){
         this.outputBuffer[i][j] = color;
     }

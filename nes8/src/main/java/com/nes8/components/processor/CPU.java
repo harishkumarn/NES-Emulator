@@ -2,10 +2,8 @@ package com.nes8.components.processor;
 
 import com.nes8.Settings;
 import com.nes8.components.software.ISA;
-import com.nes8.graphics.ObjectAttributeMemory;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.nes8.components.DMA;
 import com.nes8.components.bus.Bus;
 
 /**

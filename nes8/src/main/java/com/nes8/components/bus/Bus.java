@@ -45,8 +45,11 @@ public class Bus{
         }else if(address >= 0x2000 && address <= 0x3EFF){
             return ppu.nt.read((address - 0x2000 ) & 0x7FF);// Mirrored every 2KB
         }else if(address >=0x3F00 && address <= 0x3FFF ){
-            // TODO : Handle mirrors
-            return ppu.pallete.readPallete(address);
+            // PPU's Palette Memory is about 32 Bytes
+            // 0x3F00 to 0x3F1F
+            // 0x3F20 to 0x3F3F, 0x3F40 to 0x3F5F....., 0X3FEF TO 3FFF are mirrors
+            // So, every 0x20 Bytes the Palette RAM repeats
+            return ppu.pallete.readPallete(address & 0x3F1F);
         }
         return 0;
     }
