@@ -31,9 +31,9 @@ public class PatternTable {
 
     public void init(int address){
         if(!Settings.RENDER_META_DATA) return;
-        for(int j = 0 ; j < 128;j += 8){
-            for(int i = 0 ; i < 128; i += 8  ){
-                RenderingUtils.renderTile(i,j, address, pt,Pallete.PATTERN_TABLE_COLORS, bus);
+        for(int i = 0 ; i < 128;i += 8){
+            for(int j = 0 ; j < 128; j += 8  ){
+                RenderingUtils.renderTile(j,i, address, pt,Pallete.PATTERN_TABLE_COLORS, bus);
                 address += 16;
             }
         }

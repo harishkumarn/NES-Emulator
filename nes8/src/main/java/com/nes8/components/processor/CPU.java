@@ -186,17 +186,17 @@ public class CPU{
 
     public int getIndirectX(){
         int address = getZeroPageX();
-        byte low = bus.cpuRead(address);
-        byte high = bus.cpuRead(address+1);
+        int low = bus.cpuRead(address) & 0xFF;
+        int high = bus.cpuRead((address+1 ) & 0xFF) & 0xFF;
         address = ((high << 8 ) | low ) & 0xFFFF;
         return address;
     }
 
     public int getIndirectY(){
         int address = getZeroPage();
-        byte low = bus.cpuRead(address);
-        byte high = bus.cpuRead(address+1);
-        address = ((high << 8 ) | low  + indexY) & 0xFFFF;
+        int low = bus.cpuRead(address) & 0xFF;
+        int  high = bus.cpuRead((address+1 ) & 0xFF) & 0xFF;
+        address = ((( high << 8 ) | low ) + indexY ) & 0xFFFF;
         return address;
     }
 

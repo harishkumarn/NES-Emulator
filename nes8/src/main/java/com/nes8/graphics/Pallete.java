@@ -9,7 +9,7 @@ import com.nes8.components.helper.Display;
 /**
  * Range : 0x3F00 to 0x3FFF 
  * 0x3F00 to 0x3F1F - 32 B
- * -> 0x3000 to 0x3F0F - Background palettes ( 4 sets of 4 colors)
+ * -> 0x3F00 to 0x3F0F - Background palettes ( 4 sets of 4 colors)
  * -> 0x3F10 to 0x 0x3F1F - Foreground palettes ( 4 sets of 4 colors )
  * Mirrors of 0x3F00 to 0x3F1F : 0x3F20 to 0x3FFF 
  */

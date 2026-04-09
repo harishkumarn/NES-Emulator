@@ -22,8 +22,8 @@ public class RenderingUtils {
         for(int k = 0; k < 8;++k) highByte[k] = bus.ppuRead(address++);//plane 2
         for(int k = 0; k < 8;++k){
             for(int l = 7; l >= 0;--l){
-                y = i + ( 7 - l );
-                x = j + k ;
+                x = i + k;
+                y = j + ( 7 - l );
                 c = 0 ;
                 if((highByte[k] & ( 1<< l)) > 0 ) c = 2;
                 if((lowByte[k] & ( 1<< l)) > 0) c += 1;

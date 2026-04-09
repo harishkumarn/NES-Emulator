@@ -19,14 +19,14 @@ public class MMC0 implements MemoryMappingController{
         if(address >=  0x6000 && address <= 0x7FFF){
             return rom.sram[address - 0x6000];
         }
-        else if(address >= 0x8000 && address <= 0xBFFF){
-            return rom.pgr_ROM[address - 0x8000];
+        else if(address >= 0x8000 && address <= 0xFFFF){
+            return rom.pgr_ROM[address & ( rom.pgr_ROM.length > 16 * Constants.ONE_KB ? 0x7FFF : 0x3FFF)];
         }
-        else if(address >= 0xC000 && address <= 0xFFFF){
-            // PGR ROM is either 16KB or 32 KB
-            if(rom.pgr_ROM.length > 16 * Constants.ONE_KB) return rom.pgr_ROM[(address - 0x8000 ) & 0x7FFF];
-            else return rom.pgr_ROM[(address - 0xC000 ) & 0X3FFF ];
-        }
+        // else if(address >= 0xC000 && address <= 0xFFFF){
+        //     // PGR ROM is either 16KB or 32 KB
+        //     if(rom.pgr_ROM.length > 16 * Constants.ONE_KB) return rom.pgr_ROM[(address - 0x8000 ) & 0x7FFF];
+        //     else return rom.pgr_ROM[(address - 0xC000 ) & 0X3FFF ];
+        // }
         return 0;
     }
 

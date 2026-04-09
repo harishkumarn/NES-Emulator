@@ -25,7 +25,7 @@ public class PPU {
     OutputBuffer gui ;
 
     //8 PPU registers memory mapped from 0x2000 to 0x2007
-    public byte[] registers = new byte[8];
+    public volatile byte[] registers = new byte[8];
 
     public PPU(Bus bus){
         this.bus = bus;
@@ -36,7 +36,7 @@ public class PPU {
         bus.setPPU(this);
     }
 
-    public void start(){
+    public void start() throws InterruptedException{
         initPatternTables();
         renderGUI();
     }
@@ -47,26 +47,48 @@ public class PPU {
     }
 
 
-    private void renderGUI(){
+    private void renderGUI() throws InterruptedException{
+        registers[2] |= 0x80;
+        bus.cpu.NMI();
         while(true){
             // Each iteration renders a frame
             int vramOffset = getVRAMOffset();
             int ptOffset = getPTOffsetForBackground();
+            //0 - 239 -> Visible. Each scanline = 256 Pixels + HBLANK
             for(int i = 0 ; i < 240; i += 8 ){
-                for(int j = 0 ; j < 256; i += j ){
+
+                // Each scan line is 341 PPU Cycles
+                // 0-255 Pixel-rendering
+                // 256 - 340 - HBLANK
+                //      256 - 320 Sprite fetch for next line
+                //      321 - 340 Fetches tile data for next line
+                for(int j = 0 ; j < 256; j += 8 ){
                     byte tileIndex = bus.ppuRead(vramOffset ++);
                     RenderingUtils.renderTile(i, j, ptOffset + tileIndex * 16, gui.outputBuffer,getPalleteForBackground(i,j, vramOffset) , bus);
                 }
+                //H-BLANK
             }
+            // 240 - Post-Render   
+            cycle(341);
+
+            // 241 - 260
+            //V-BLANK
+            registers[2] |= 0x80; // Set bit 7
             bus.cpu.NMI();
+            vBlank();
+
+            // 261 - Pre-Blank
+            registers[2] &= ~0x80; // Clear Bit 7
+            cycle( 341 );
             this.gui.rerender();
         }
     }
 
     public byte read(int registerIndex){
-        if(registerIndex == 2){
+        /*if(registerIndex == 2){
+            Got no clue why the hell I wrote this line
             if(registers[2] < 0) registers[2]  ^= 0x80;
-        }
+        }*/
 
         return registers[registerIndex];
     }
@@ -81,7 +103,7 @@ public class PPU {
             break;
             case 1:// PPUMASK
             break;
-            case 2:// PPUSTATUS. Can't write to the status register
+            case 2:// PPUSTATUS
             if((data & 0x80 ) == 0x80) bus.cpu.NMI();
             break;
             case 3:// OAMADDR
@@ -127,7 +149,7 @@ public class PPU {
         int attributeTableOffset = vramOffset + 960;
         byte data = bus.ppuRead(attributeTableOffset + i * 8 + j * 8);
         int pIndex = 0;
-        switch(tileQuadrantMapping[(j % 4 ) / 2][(i % 4 ) /2]){
+        switch(tileQuadrantMapping[(i % 4 ) / 2][(j % 4 ) /2]){
             case 0:
             pIndex = (data >> 6) & 3;
             break;
@@ -155,6 +177,6 @@ public class PPU {
     }
 
     private void vBlank() throws InterruptedException{
-        cycle(21 * 341);
+        cycle(20 * 341);
     }
 }

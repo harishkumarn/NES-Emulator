@@ -197,7 +197,7 @@ public class ISA {
                 int temp = cpu.accumulator + operand  + cpu.getFlag(Flag.C);
                 updateADCFlags(cpu.accumulator, operand , cpu.getFlag(Flag.C));
                 cpu.accumulator = (byte)(temp & 0xFF);
-                printASM("ADC "+ Integer.toString(operand));
+                printASM("ADC "+ Integer.toHexString(operand));
                 return (byte)cycle;
             }
         });
@@ -206,7 +206,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getZeroPage();
                 ADC(address);
-                printASM("ADC Z "+ Integer.toString(address));
+                printASM("ADC Z "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -215,7 +215,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getZeroPageX();
                 ADC(address);
-                printASM("ADC Zx "+ Integer.toString(address));
+                printASM("ADC Zx "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -224,7 +224,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getAbsolute();
                 ADC(address);
-                printASM("ADC A "+ Integer.toString(address) );
+                printASM("ADC A "+ Integer.toHexString(address) );
                 return (byte)cycle;
             }
         });
@@ -233,7 +233,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getAbsoluteX();
                 ADC(address);
-                printASM("ADC Ax "+ Integer.toString(address));
+                printASM("ADC Ax "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -242,7 +242,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getAbsoluteY();
                 ADC(address);
-                printASM("ADC Ay "+ Integer.toString(address));
+                printASM("ADC Ay "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -251,7 +251,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getIndirectX();
                 ADC(address);
-                printASM("ADC Ix "+ Integer.toString(address));
+                printASM("ADC Ix "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -260,7 +260,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getIndirectY();
                 ADC(address);
-                printASM("ADC Iy "+ Integer.toString(address) );
+                printASM("ADC Iy "+ Integer.toHexString(address) );
                 return (byte)cycle;
             }
         });
@@ -275,7 +275,7 @@ public class ISA {
                 int temp = cpu.accumulator & operand ;
                 updateZNFlags(temp);
                 cpu.accumulator = (byte)(temp & 0xFF);
-                printASM("AND "+ Integer.toString(operand));
+                printASM("AND "+ Integer.toHexString(operand));
                 return (byte)cycle;
             }
         });
@@ -284,7 +284,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getZeroPage();
                 AND(address);
-                printASM("AND Z "+ Integer.toString(address));
+                printASM("AND Z "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -293,7 +293,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getZeroPageX();
                 AND(address);
-                printASM("AND Zx "+ Integer.toString(address));
+                printASM("AND Zx "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -302,7 +302,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getAbsolute();
                 AND(address);
-                printASM("AND A "+ Integer.toString(address ));
+                printASM("AND A "+ Integer.toHexString(address ));
                 return (byte)cycle;
             }
         });
@@ -311,7 +311,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getAbsoluteX();
                 AND(address);
-                printASM("AND Ax "+ Integer.toString(address));
+                printASM("AND Ax "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -320,7 +320,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getAbsoluteY();
                 AND(address);
-                printASM("AND Ay "+ Integer.toString(address));
+                printASM("AND Ay "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -329,7 +329,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getIndirectX();
                 AND(address);
-                printASM("AND Ix "+ Integer.toString(address));
+                printASM("AND Ix "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -338,7 +338,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getIndirectY();
                 AND(address);
-                printASM("AND Iy "+ Integer.toString(address));
+                printASM("AND Iy "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -362,7 +362,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getZeroPage();
                 ASL(address);
-                printASM("ASL Z "+ Integer.toString(address));
+                printASM("ASL Z "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -371,7 +371,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getZeroPageX();
                 ASL(address);
-                printASM("ASL Zx "+ Integer.toString(address));
+                printASM("ASL Zx "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -380,7 +380,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getAbsolute();
                 ASL(address);
-                printASM("ASL A "+ Integer.toString(address) );
+                printASM("ASL A "+ Integer.toHexString(address) );
                 return (byte)cycle;
             }
         });
@@ -389,7 +389,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getAbsoluteX();
                 ASL(address);
-                printASM("ASL Ax "+ Integer.toString(address));
+                printASM("ASL Ax "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -404,7 +404,7 @@ public class ISA {
                 if(cpu.getFlag(Flag.C) == 0 ){
                     cpu.programCounter += operand;
                 }
-                printASM("BCC "+ Integer.toString(operand) );
+                printASM("BCC "+ Integer.toHexString(operand) );
                 return (byte)cycle;
             }
         });
@@ -419,7 +419,7 @@ public class ISA {
                     cpu.programCounter += operand;
 
                 }
-                printASM("BCS "+ Integer.toString(operand) );
+                printASM("BCS "+ Integer.toHexString(operand) );
                 return (byte)cycle;
             }
         });
@@ -433,7 +433,7 @@ public class ISA {
                 if(cpu.getFlag(Flag.Z) == 1 ){
                     cpu.programCounter += operand;
                 }
-                printASM("BEQ "+ Integer.toString(operand) );
+                printASM("BEQ "+ Integer.toHexString(operand) );
                 return (byte)cycle;
             }
         });
@@ -448,7 +448,7 @@ public class ISA {
                 if(cpu.getFlag(Flag.N) == 1 ){
                     cpu.programCounter += operand;
                 }
-                printASM("BMI "+ Integer.toString(operand) );
+                printASM("BMI "+ Integer.toHexString(operand) );
                 return (byte)cycle;
             }
         });
@@ -476,7 +476,7 @@ public class ISA {
                 if(cpu.getFlag(Flag.N) == 0 ){
                     cpu.programCounter += operand;
                 }
-                printASM("BPL "+ Integer.toString(operand) );
+                printASM("BPL "+ Integer.toHexString(operand) );
                 return (byte)cycle;
             }
         });
@@ -490,7 +490,7 @@ public class ISA {
                 if(cpu.getFlag(Flag.V) == 0 ){
                     cpu.programCounter += operand;
                 }
-                printASM("BVC "+ Integer.toString(operand) );
+                printASM("BVC "+ Integer.toHexString(operand) );
                 return (byte)cycle;
             }
         });
@@ -504,7 +504,7 @@ public class ISA {
                 if(cpu.getFlag(Flag.V) == 1 ){
                     cpu.programCounter += operand;
                 }
-                printASM("BVS "+ Integer.toString(operand) );
+                printASM("BVS "+ Integer.toHexString(operand) );
                 return (byte)cycle;
             }
         });
@@ -601,7 +601,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getZeroPage();
                 BIT(address);
-                printASM("BIT Z " + Integer.toString(address) );
+                printASM("BIT Z " + Integer.toHexString(address) );
                 return (byte)cycle;
             }
         });
@@ -611,7 +611,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getAbsolute();
                 BIT(address);
-                printASM("BIT A " + Integer.toString(address ));
+                printASM("BIT A " + Integer.toHexString(address ));
                 return (byte)cycle;
             }
         });
@@ -625,7 +625,7 @@ public class ISA {
                 byte operand = cpu.bus.cpuRead(cpu.programCounter++);
                 int temp = cpu.accumulator - operand ;
                 updateCMPFlags(temp);
-                printASM("CMP "+ Integer.toString(operand));
+                printASM("CMP "+ Integer.toHexString(operand));
                 return (byte)cycle;
             }
         });
@@ -634,7 +634,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getZeroPage();
                 CMP(address);
-                printASM("CMP Z "+ Integer.toString(address));
+                printASM("CMP Z "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -643,7 +643,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getZeroPageX();
                 CMP(address);
-                printASM("CMP Zx "+ Integer.toString(address));
+                printASM("CMP Zx "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -652,7 +652,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getAbsolute();
                 CMP(address);
-                printASM("CMP A "+ Integer.toString(address ));
+                printASM("CMP A "+ Integer.toHexString(address ));
                 return (byte)cycle;
             }
         });
@@ -661,7 +661,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getAbsoluteX();
                 CMP(address);
-                printASM("CMP Ax "+ Integer.toString(address));
+                printASM("CMP Ax "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -670,7 +670,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getAbsoluteY();
                 CMP(address);
-                printASM("CMP Ay "+ Integer.toString(address));
+                printASM("CMP Ay "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -679,7 +679,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getIndirectX();
                 CMP(address);
-                printASM("CMP Ix "+ Integer.toString(address) );
+                printASM("CMP Ix "+ Integer.toHexString(address) );
                 return (byte)cycle;
             }
         });
@@ -688,7 +688,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getIndirectY();
                 CMP(address);
-                printASM("CMP Iy "+ Integer.toString(address) );
+                printASM("CMP Iy "+ Integer.toHexString(address) );
                 return (byte)cycle;
             }
         });
@@ -701,7 +701,7 @@ public class ISA {
                 byte operand = cpu.bus.cpuRead(cpu.programCounter++);
                 int temp = cpu.indexX - operand ;
                 updateCMPFlags(temp);
-                printASM("CPX "+ Integer.toString(operand));
+                printASM("CPX "+ Integer.toHexString(operand));
                 return (byte)cycle;
             }
         });
@@ -711,7 +711,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getZeroPage();
                 CPX(address);
-                printASM("CPX Z "+ Integer.toString(address));
+                printASM("CPX Z "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -721,7 +721,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getAbsolute();
                 CPX(address);
-                printASM("CPX A "+ Integer.toString(address ));
+                printASM("CPX A "+ Integer.toHexString(address ));
                 return (byte)cycle;
             }
         });
@@ -735,7 +735,7 @@ public class ISA {
                 byte operand = cpu.bus.cpuRead(cpu.programCounter++);
                 int temp = cpu.indexY - operand ;
                 updateCMPFlags(temp);
-                printASM("CPY "+ Integer.toString(operand));
+                printASM("CPY "+ Integer.toHexString(operand));
                 return (byte)cycle;
             }
         });
@@ -745,7 +745,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getZeroPage();
                 CPY(address);
-                printASM("CPY Z "+ Integer.toString(address));
+                printASM("CPY Z "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -755,7 +755,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getAbsolute();
                 CPY(address);
-                printASM("CPY A "+ Integer.toString(address) );
+                printASM("CPY A "+ Integer.toHexString(address) );
                 return (byte)cycle;
             }
         });
@@ -778,7 +778,7 @@ public class ISA {
             public byte execute(){
                 byte address = cpu.getZeroPage();
                 DEC(address);
-                printASM("DEC Z " + Integer.toString(address)); 
+                printASM("DEC Z " + Integer.toHexString(address)); 
                 return (byte)cycle;
             }
         });
@@ -788,7 +788,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getZeroPageX();
                 DEC(address);
-                printASM("DEC Zx " +  Integer.toString(address) );
+                printASM("DEC Zx " +  Integer.toHexString(address) );
                 return (byte)cycle;
             }
         });
@@ -798,7 +798,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getAbsolute();
                 DEC(address);
-                printASM("DEC A " +  Integer.toString(address));
+                printASM("DEC A " +  Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -808,7 +808,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getAbsoluteX();
                 DEC(address);
-                printASM("DEC Ax " +  Integer.toString(address ));
+                printASM("DEC Ax " +  Integer.toHexString(address ));
                 return (byte)cycle;
             }
         });
@@ -831,6 +831,9 @@ public class ISA {
         opcodes.put((byte)0x88,new Opcode((byte)2){
             @Override
             public byte execute(){
+                if(cpu.indexY == 1){
+                    int x = 2;
+                }
                 updateZNFlags( --cpu.indexY  );
                 printASM("DEY");
                 return (byte)cycle;
@@ -869,7 +872,7 @@ public class ISA {
             public byte execute(){
                 byte address = cpu.getZeroPage();
                 INC(address);
-                printASM("INC Z " + Integer.toString(address));
+                printASM("INC Z " + Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -879,7 +882,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getZeroPageX();
                 INC(address);
-                printASM("INC Zx " +  Integer.toString(address));
+                printASM("INC Zx " +  Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -889,7 +892,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getAbsolute();
                 INC(address);
-                printASM("INC A " +  Integer.toString(address));
+                printASM("INC A " +  Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -899,7 +902,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getAbsoluteX();
                 INC(address);
-                printASM("INC Ax " +  Integer.toString(address));
+                printASM("INC Ax " +  Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -911,7 +914,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getIndirectX();
                 EOR(address);
-                printASM("EOR Ix "+ Integer.toString(address));
+                printASM("EOR Ix "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -921,7 +924,7 @@ public class ISA {
             public byte execute(){
                 byte address = cpu.getZeroPage();
                 EOR(address);
-                printASM("EOR Z " + Integer.toString(address));
+                printASM("EOR Z " + Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -932,7 +935,7 @@ public class ISA {
                 byte operand = cpu.bus.cpuRead(cpu.programCounter++);
                 cpu.accumulator = (byte) (operand ^ cpu.accumulator);
                 updateZNFlags(cpu.accumulator);
-                printASM("EOR " + Integer.toString(operand));
+                printASM("EOR " + Integer.toHexString(operand));
                 return (byte)cycle;
             }
         });
@@ -942,7 +945,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getAbsolute();
                 EOR(address);
-                printASM("EOR A " + Integer.toString(address));
+                printASM("EOR A " + Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -952,7 +955,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getIndirectY();
                 EOR(address);
-                printASM("EOR Iy "+ Integer.toString(address));
+                printASM("EOR Iy "+ Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -962,7 +965,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getZeroPageX();
                 EOR(address);
-                printASM("EOR Zx " + Integer.toString(address ));
+                printASM("EOR Zx " + Integer.toHexString(address ));
                 return (byte)cycle;
             }
         });
@@ -972,7 +975,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getAbsoluteY();
                 EOR(address);
-                printASM("EOR Ay " +  Integer.toString(address));
+                printASM("EOR Ay " +  Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -982,7 +985,7 @@ public class ISA {
             public byte execute(){
                 int address = cpu.getAbsoluteX();
                 EOR(address);
-                printASM("EOR Ax " +  Integer.toString(address));
+                printASM("EOR Ax " +  Integer.toHexString(address));
                 return (byte)cycle;
             }
         });
@@ -993,7 +996,7 @@ public class ISA {
             @Override
             public byte execute(){
                 cpu.programCounter = cpu.getAbsolute();
-                printASM("JMP A " + Integer.toString(cpu.programCounter));
+                printASM("JMP A " + Integer.toHexString(cpu.programCounter));
                 return (byte)cycle;
             }
         });
@@ -1002,7 +1005,7 @@ public class ISA {
             @Override
             public byte execute(){
                 cpu.programCounter = cpu.getIndirect();
-                printASM("JMP I " + Integer.toString(cpu.programCounter));
+                printASM("JMP I " + Integer.toHexString(cpu.programCounter));
                 return (byte)cycle;
             }
         });
@@ -1015,7 +1018,7 @@ public class ISA {
             int address = cpu.getAbsolute();
             cpu.pushAddressToStack(cpu.programCounter - 1);
             cpu.programCounter = address;
-            printASM("JSR A " + Integer.toString(cpu.programCounter));
+            printASM("JSR A " + Integer.toHexString(cpu.programCounter));
             return (byte)cycle;
         }   
     });
@@ -1053,7 +1056,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getZeroPage();
             cpu.bus.cpuWrite(address,cpu.accumulator);
-            printASM("STA Z "+Integer.toString(address));
+            printASM("STA Z "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1063,7 +1066,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getZeroPageX();
             cpu.bus.cpuWrite(address,cpu.accumulator);
-            printASM("STA Zx "+Integer.toString(address));
+            printASM("STA Zx "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1073,7 +1076,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getAbsolute();
             cpu.bus.cpuWrite(address,cpu.accumulator);
-            printASM("STA A "+Integer.toString(address));
+            printASM("STA A "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1083,7 +1086,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getAbsoluteX();
             cpu.bus.cpuWrite(address,cpu.accumulator);
-            printASM("STA Ax "+Integer.toString(address));
+            printASM("STA Ax "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1093,7 +1096,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getAbsoluteY();
             cpu.bus.cpuWrite(address,cpu.accumulator);
-            printASM("STA Ay "+Integer.toString(address));
+            printASM("STA Ay "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1103,7 +1106,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getIndirectX();
             cpu.bus.cpuWrite(address,cpu.accumulator);
-            printASM("STA Ix "+Integer.toString(address));
+            printASM("STA Ix "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1113,7 +1116,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getIndirectY();
             cpu.bus.cpuWrite(address,cpu.accumulator);
-            printASM("STA Iy "+Integer.toString(address));
+            printASM("STA Iy "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1124,7 +1127,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getZeroPage();
             cpu.bus.cpuWrite(address,cpu.indexX);
-            printASM("STX Z "+Integer.toString(address));
+            printASM("STX Z "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });    
@@ -1134,7 +1137,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getZeroPageY();
             cpu.bus.cpuWrite(address,cpu.indexX);
-            printASM("STX Zy "+Integer.toString(address));
+            printASM("STX Zy "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1144,7 +1147,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getAbsolute();
             cpu.bus.cpuWrite(address,cpu.indexX);
-            printASM("STX A "+Integer.toString(address));
+            printASM("STX A "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1156,7 +1159,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getZeroPage();
             cpu.bus.cpuWrite(address,cpu.indexY);
-            printASM("STY Z "+Integer.toString(address));
+            printASM("STY Z "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });    
@@ -1166,7 +1169,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getZeroPageX();
             cpu.bus.cpuWrite(address,cpu.indexY);
-            printASM("STY Zx "+Integer.toString(address));
+            printASM("STY Zx "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1176,7 +1179,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getAbsolute();
             cpu.bus.cpuWrite(address,cpu.indexY);
-            printASM("STY A "+Integer.toString(address));
+            printASM("STY A "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1189,7 +1192,7 @@ public class ISA {
             byte value = cpu.bus.cpuRead(cpu.programCounter++);
             cpu.accumulator = value;
             updateZNFlags(cpu.accumulator);
-            printASM("LDA "+Integer.toString(value));
+            printASM("LDA "+Integer.toHexString(value));
             return (byte)cycle;
         }
     });
@@ -1199,7 +1202,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getZeroPage();
             LDA(address);
-            printASM("LDA Z "+Integer.toString(address));
+            printASM("LDA Z "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1209,7 +1212,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getZeroPageX();
             LDA(address);
-            printASM("LDA Zx "+Integer.toString(address));
+            printASM("LDA Zx "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1219,7 +1222,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getAbsolute();
             LDA(address);
-            printASM("LDA A "+Integer.toString(address));
+            printASM("LDA A "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1229,7 +1232,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getAbsoluteX();
             LDA(address);
-            printASM("LDA Ax "+Integer.toString(address));
+            printASM("LDA Ax "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1239,7 +1242,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getAbsoluteY();
             LDA(address);
-            printASM("LDA Ay "+Integer.toString(address));
+            printASM("LDA Ay "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1249,7 +1252,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getIndirectX();
             LDA(address);
-            printASM("LDA Ix "+Integer.toString(address));
+            printASM("LDA Ix "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1259,7 +1262,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getIndirectY();
             LDA(address);
-            printASM("LDA Iy "+Integer.toString(address));
+            printASM("LDA Iy "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1272,7 +1275,7 @@ public class ISA {
             byte value = cpu.bus.cpuRead(cpu.programCounter++);
             cpu.indexX = value;
             updateZNFlags(cpu.indexX);
-            printASM("LDX "+Integer.toString(value));
+            printASM("LDX "+Integer.toHexString(value));
             return (byte)cycle;
         }
     });
@@ -1282,7 +1285,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getZeroPage();
             LDX(address);
-            printASM("LDX Z "+Integer.toString(address));
+            printASM("LDX Z "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1292,7 +1295,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getZeroPageY();
             LDX(address);
-            printASM("LDX Zy "+Integer.toString(address));
+            printASM("LDX Zy "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1302,7 +1305,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getAbsolute();
             LDX(address);
-            printASM("LDX A "+Integer.toString(address));
+            printASM("LDX A "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1312,7 +1315,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getAbsoluteY();
             LDX(address);
-            printASM("LDX Ay "+Integer.toString(address));
+            printASM("LDX Ay "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1325,7 +1328,7 @@ public class ISA {
             byte value =  cpu.bus.cpuRead(cpu.programCounter++);
             cpu.indexY = value;
             updateZNFlags(cpu.indexY);
-            printASM("LDY "+Integer.toString(value));
+            printASM("LDY "+Integer.toHexString(value));
             return (byte)cycle;
         }
     });
@@ -1335,7 +1338,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getZeroPage();
             LDY(address);
-            printASM("LDY Z "+Integer.toString(address));
+            printASM("LDY Z "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1345,7 +1348,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getZeroPageX();
             LDY(address);
-            printASM("LDY Zx "+Integer.toString(address));
+            printASM("LDY Zx "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1355,7 +1358,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getAbsolute();
             LDY(address);
-            printASM("LDY A "+Integer.toString(address));
+            printASM("LDY A "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1365,7 +1368,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getAbsoluteX();
             LDY(address);
-            printASM("LDY Ax "+Integer.toString(address));
+            printASM("LDY Ax "+Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1391,7 +1394,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getZeroPage();
             LSR(address);
-            printASM("LSR Z " +  Integer.toString(address));
+            printASM("LSR Z " +  Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1400,7 +1403,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getZeroPageX();
             LSR(address);
-            printASM("LSR Zx" + Integer.toString(address));
+            printASM("LSR Zx" + Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1409,7 +1412,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getAbsolute();
             LSR(address);
-            printASM("LSR A" + Integer.toString(address));
+            printASM("LSR A" + Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1418,7 +1421,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getAbsoluteX();
             LSR(address);
-            printASM("LSR Ax" + Integer.toString(address));
+            printASM("LSR Ax" + Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1430,7 +1433,7 @@ public class ISA {
             byte value = cpu.bus.cpuRead(cpu.programCounter++);
             cpu.accumulator |= value;
             updateZNFlags(cpu.accumulator);
-            printASM("ORA " + Integer.toString(value));
+            printASM("ORA " + Integer.toHexString(value));
             return (byte)cycle;
         }
     });
@@ -1439,7 +1442,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getZeroPage();
             ORA(address);
-            printASM("ORA Z " + Integer.toString(address));
+            printASM("ORA Z " + Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1448,7 +1451,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getZeroPageX();
             ORA(address);
-            printASM("ORA Zx " + Integer.toString(address));
+            printASM("ORA Zx " + Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1457,7 +1460,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getAbsolute();
             ORA(address);
-            printASM("ORA A " + Integer.toString(address));
+            printASM("ORA A " + Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1466,7 +1469,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getAbsoluteX();
             ORA(address);
-            printASM("ORA Ax " + Integer.toString(address));
+            printASM("ORA Ax " + Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1475,7 +1478,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getAbsoluteY();
             ORA(address);
-            printASM("ORA Ay " + Integer.toString(address));
+            printASM("ORA Ay " + Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1484,7 +1487,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getIndirectX();
             ORA(address);
-            printASM("ORA Ix " + Integer.toString(address));
+            printASM("ORA Ix " + Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1493,7 +1496,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getIndirectY();
             ORA(address);
-            printASM("ORA Iy " + Integer.toString(address));
+            printASM("ORA Iy " + Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1559,7 +1562,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getZeroPage();
             ROL(address);
-            printASM("ROL Z " + Integer.toString(address));
+            printASM("ROL Z " + Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1568,7 +1571,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getZeroPageX();
             ROL(address);
-            printASM("ROL Zx " + Integer.toString(address));
+            printASM("ROL Zx " + Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1577,7 +1580,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getAbsolute();
             ROL(address);
-            printASM("ROL A " + Integer.toString(address));
+            printASM("ROL A " + Integer.toHexString(address));
             return (byte)cycle;
         }
 
@@ -1587,7 +1590,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getAbsoluteX();
             ROL(address);
-            printASM("ROL Ax " + Integer.toString(address));
+            printASM("ROL Ax " + Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1609,7 +1612,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getZeroPage();
             ROR(address);
-            printASM("ROR Z " + Integer.toString(address));
+            printASM("ROR Z " + Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1618,7 +1621,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getZeroPageX();
             ROR(address);
-            printASM("ROR Zx " + Integer.toString(address));
+            printASM("ROR Zx " + Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1627,7 +1630,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getAbsolute();
             ROR(address);
-            printASM("ROR A " + Integer.toString(address));
+            printASM("ROR A " + Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1636,7 +1639,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getAbsoluteX();
             ROR(address);
-            printASM("ROR Ax " + Integer.toString(address));
+            printASM("ROR Ax " + Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1647,7 +1650,7 @@ public class ISA {
         public byte execute(){
             byte value = cpu.bus.cpuRead(cpu.programCounter++);
             SBC(value);
-            printASM("SBC " + Integer.toString(value));
+            printASM("SBC " + Integer.toHexString(value));
             return (byte)cycle;
         }
     });
@@ -1656,7 +1659,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getZeroPage();
             SBC(cpu.bus.cpuRead(address));
-            printASM("SBC Z " + Integer.toString(address));
+            printASM("SBC Z " + Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1665,7 +1668,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getZeroPageX();
             SBC(cpu.bus.cpuRead(address));
-            printASM("SBC Zx " + Integer.toString(address));
+            printASM("SBC Zx " + Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1674,7 +1677,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getAbsolute();
             SBC(cpu.bus.cpuRead(address));
-            printASM("SBC A " + Integer.toString(address));
+            printASM("SBC A " + Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1683,7 +1686,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getAbsoluteX();
             SBC(cpu.bus.cpuRead(address));
-            printASM("SBC Ax " + Integer.toString(address));
+            printASM("SBC Ax " + Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1692,7 +1695,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getAbsoluteY();
             SBC(cpu.bus.cpuRead(address));
-            printASM("SBC Ay " + Integer.toString(address));
+            printASM("SBC Ay " + Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1701,7 +1704,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getIndirectX();
             SBC(cpu.bus.cpuRead(address));
-            printASM("SBC Ix " + Integer.toString(address));
+            printASM("SBC Ix " + Integer.toHexString(address));
             return (byte)cycle;
         }
     });
@@ -1710,7 +1713,7 @@ public class ISA {
         public byte execute(){
             int address = cpu.getIndirectY();
             SBC(cpu.bus.cpuRead(address));
-            printASM("SBC Iy " + Integer.toString(address));
+            printASM("SBC Iy " + Integer.toHexString(address));
             return (byte)cycle;
         }
     });
