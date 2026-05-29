@@ -44,7 +44,7 @@ public class ISA {
         cpu.updateFlag(Flag.V, (~(ua ^ uo) & (ua ^ sum) & 0x80) != 0);
     }
 
-    private void updateZNFlags(byte val){
+    private void updateZNFlags(int val){
         cpu.updateFlag(Flag.Z, (val & 0xFF) == 0);
         cpu.updateFlag(Flag.N, (val & 0x80) > 0);
     }

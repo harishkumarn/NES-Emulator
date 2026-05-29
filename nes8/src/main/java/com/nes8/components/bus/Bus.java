@@ -117,6 +117,7 @@ public class Bus{
                 palAddr &= 0x0F;// These addresses are mirrors of 0x00, 0x04, 0x08, 0x0C
             }
             ppu.pallete.updatePalette(0x3F00 + palAddr, value);
+        }
     } 
 
     public void setCPU(CPU cpu){

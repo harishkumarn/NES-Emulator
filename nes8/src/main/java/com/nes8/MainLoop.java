@@ -40,7 +40,7 @@ public class MainLoop
             try{
                 apu.startSound();// 1.79 Mhz
             }catch(Exception e){}
-        });
+        }).start();
         
     }
 }
