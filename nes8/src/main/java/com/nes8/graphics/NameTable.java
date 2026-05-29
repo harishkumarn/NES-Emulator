@@ -28,10 +28,8 @@ public class NameTable {
         }
     }
 
-
-    // TODO : Handle mirroring
     public byte read(int address){
-        return vram[address];
+        return vram[address & 0x7FF];
     }
 }
 

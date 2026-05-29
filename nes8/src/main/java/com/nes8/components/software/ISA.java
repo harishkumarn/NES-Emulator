@@ -36,16 +36,19 @@ public class ISA {
     }
 
     private void updateADCFlags(byte a, byte o, byte c){
-        cpu.updateFlag(Flag.C, (a + o + c) > 255);
-        cpu.updateFlag(Flag.Z, ((a + o + c) & 0xFF) == 0);
-        cpu.updateFlag(Flag.N, ((a + o + c) & 0x80) > 0 );
-        cpu.updateFlag(Flag.V, ((~(a ^ o) & (a ^ (a + o + c))) & 0x0080)  > 0 );
-    } 
-
-    private void updateZNFlags(int val){
-        cpu.updateFlag(Flag.Z, (val & 0xFF) == 0);
-        cpu.updateFlag(Flag.N,  (val & 0x80) > 0 );
+        int ua = a & 0xFF, uo = o & 0xFF, uc = c & 0xFF;
+        int sum = ua + uo + uc;
+        cpu.updateFlag(Flag.C, sum > 0xFF);
+        cpu.updateFlag(Flag.Z, ( sum & 0xFF) == 0);
+        cpu.updateFlag(Flag.N, ( sum & 0x80) != 0  );
+        cpu.updateFlag(Flag.V, (~(ua ^ uo) & (ua ^ sum) & 0x80) != 0);
     }
+
+    private void updateZNFlags(byte val){
+        cpu.updateFlag(Flag.Z, (val & 0xFF) == 0);
+        cpu.updateFlag(Flag.N, (val & 0x80) > 0);
+    }
+
     private void updateASFlags(int val, boolean carry){
 
         cpu.updateFlag(Flag.C, carry);
@@ -62,7 +65,7 @@ public class ISA {
     public void BRK(){
         cpu.programCounter ++; 
         cpu.pushAddressToStack(cpu.programCounter);
-        cpu.stackPush((byte)(cpu.statusRegister | 0x8));
+        cpu.stackPush((byte)(cpu.statusRegister | 0x30));
         cpu.updateFlag(Flag.I, true);
         byte low = cpu.bus.cpuRead(0xFFFE);
         byte high = cpu.bus.cpuRead(0xFFFF);
@@ -70,25 +73,25 @@ public class ISA {
     }
 
     private void SBC(byte value){
-        int result = cpu.accumulator - value - 1 + cpu.getFlag(Flag.C);
+        int a = cpu.accumulator & 0xFF;
+        int v = value & 0xFF;
+        int c = cpu.getFlag(Flag.C);
+        int result = a - v - 1 + c;
         int unsigned = result & 0xFF;
-
-        cpu.updateFlag(Flag.Z, result == 0);
-        cpu.updateFlag(Flag.C, result >= 0 );
-
-        //TODO : Cross check the following 2 flags
-        cpu.updateFlag(Flag.V,((cpu.accumulator ^ value) & 0x80) != 0 && ((cpu.accumulator ^ unsigned) & 0x80) != 0);
-        cpu.updateFlag(Flag.N, (unsigned & 0x80) > 0 );
-        cpu.accumulator = (byte)(unsigned & 0xFF);
+        cpu.updateFlag(Flag.Z, unsigned == 0);
+        cpu.updateFlag(Flag.C, result >= 0);
+        cpu.updateFlag(Flag.V, ((a ^ v) & 0x80) != 0 && (( a ^ unsigned) & 0x80) != 0);
+        cpu.updateFlag(Flag.N, (unsigned & 0x80) != 0);
+        cpu.accumulator = (byte)unsigned;
     }
 
     private void LSR(int address){
-        int value = cpu.bus.cpuRead(address);
+        int value = cpu.bus.cpuRead(address) & 0xFF;
         boolean carry =( value & 1) == 1;
         value >>= 1;
         byte result = (byte)( value & 0xff);
         updateASFlags(result, carry);
-        cpu.bus.cpuWrite(address, result);
+        cpu.bus.cpuWrite(address, (byte)result);
     }
 
     private void LDY(int address){
@@ -113,12 +116,12 @@ public class ISA {
     }
 
     private void CMP(int address){
-        int temp = cpu.accumulator - cpu.bus.cpuRead(address );
+        int temp = (cpu.accumulator & 0xFF) - (cpu.bus.cpuRead(address) & 0xFF);
         updateCMPFlags(temp);
     }
 
     private void CPY(int address){
-        int temp = cpu.indexY - cpu.bus.cpuRead( address) ;
+        int temp = (cpu.indexY & 0xFF) - (cpu.bus.cpuRead( address) & 0xFF) ;
         updateCMPFlags(temp);
     }
 
@@ -162,22 +165,22 @@ public class ISA {
     }
 
     private void CPX(int address){
-        int temp = cpu.indexX - cpu.bus.cpuRead( address) ;
+        int temp = (cpu.indexX & 0xFF) - (cpu.bus.cpuRead( address) & 0xFF) ;
         updateCMPFlags(temp);
     }
     private void ROR(int address){
-        byte value = cpu.bus.cpuRead(address);
+        int value = cpu.bus.cpuRead(address) & 0xFF;
         boolean carry = ( value & 1 ) == 1;
-        int result = ((value >> 1) | (cpu.getFlag(Flag.C) << 8) ) & 0xFF;
-        updateASFlags(cpu.accumulator, carry);
+        int result = (value >> 1) | (cpu.getFlag(Flag.C) << 7);
+        updateASFlags(result, carry);
         cpu.bus.cpuWrite(address, (byte)result);
     }
 
     private void ROL(int address){
-        byte value = cpu.bus.cpuRead(address);
-        boolean carry = ( value& 0x80 ) == 0x80;
+        int value = cpu.bus.cpuRead(address) & 0xFF;
+        boolean carry = ( value & 0x80 ) == 0x80;
         int result = ((value << 1) | cpu.getFlag(Flag.C) ) & 0xFF;
-        updateASFlags(cpu.accumulator, carry);
+        updateASFlags(result, carry);
         cpu.bus.cpuWrite(address, (byte)result);
     }
 
@@ -623,7 +626,7 @@ public class ISA {
             @Override
             public byte execute(){
                 byte operand = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp = cpu.accumulator - operand ;
+                int temp = (cpu.accumulator & 0xFF) - (operand & 0xFF);
                 updateCMPFlags(temp);
                 printASM("CMP "+ Integer.toHexString(operand));
                 return (byte)cycle;
@@ -699,7 +702,7 @@ public class ISA {
             @Override
             public byte execute(){
                 byte operand = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp = cpu.indexX - operand ;
+                int temp = (cpu.indexX & 0xFF) - (operand & 0xFF);
                 updateCMPFlags(temp);
                 printASM("CPX "+ Integer.toHexString(operand));
                 return (byte)cycle;
@@ -733,7 +736,7 @@ public class ISA {
             @Override
             public byte execute(){
                 byte operand = cpu.bus.cpuRead(cpu.programCounter++);
-                int temp = cpu.indexY - operand ;
+                int temp = (cpu.indexY & 0xFF) - (operand & 0xFF);
                 updateCMPFlags(temp);
                 printASM("CPY "+ Integer.toHexString(operand));
                 return (byte)cycle;
@@ -776,7 +779,7 @@ public class ISA {
         opcodes.put((byte)0xC6,new Opcode((byte)5){
             @Override
             public byte execute(){
-                byte address = cpu.getZeroPage();
+                int address = cpu.getZeroPage();
                 DEC(address);
                 printASM("DEC Z " + Integer.toHexString(address)); 
                 return (byte)cycle;
@@ -840,37 +843,13 @@ public class ISA {
             }
         });
 
-         //-----------------------------------
-        //INX
-
-        opcodes.put((byte)0xE8,new Opcode((byte)2){
-            @Override
-            public byte execute(){
-                updateZNFlags( ++cpu.indexX  );
-                printASM("INX");
-                return (byte)cycle;
-            }
-        });
-
-        //-----------------------------------
-        //INY
-
-        opcodes.put((byte)0xC8,new Opcode((byte)2){
-            @Override
-            public byte execute(){
-                updateZNFlags( ++cpu.indexY  );
-                printASM("INY");
-                return (byte)cycle;
-            }
-        });
-
         //-----------------------------------
         //INC
 
         opcodes.put((byte)0xE6,new Opcode((byte)5){
             @Override
             public byte execute(){
-                byte address = cpu.getZeroPage();
+                int address = cpu.getZeroPage();
                 INC(address);
                 printASM("INC Z " + Integer.toHexString(address));
                 return (byte)cycle;
@@ -922,7 +901,7 @@ public class ISA {
         opcodes.put((byte)0x45, new Opcode((byte)3){
             @Override
             public byte execute(){
-                byte address = cpu.getZeroPage();
+                int address = cpu.getZeroPage();
                 EOR(address);
                 printASM("EOR Z " + Integer.toHexString(address));
                 return (byte)cycle;
@@ -1012,7 +991,7 @@ public class ISA {
 
     //-----------------------------
     //JSR
-    opcodes.put((byte)0x29, new Opcode((byte)6){
+    opcodes.put((byte)0x20, new Opcode((byte)6){
         @Override
         public byte execute(){
             int address = cpu.getAbsolute();
@@ -1029,7 +1008,7 @@ public class ISA {
         public byte execute(){
             byte low = cpu.stackPop();
             byte high = cpu.stackPop();
-            cpu.programCounter = (((high << 8 ) | low) & 0xFFFF ) + 1;
+            cpu.programCounter = ((( ( high & 0xFF) << 8 ) | ( low & 0xFF ) ) & 0xFFFF ) + 1;
             printASM("RTS");
             return (byte)cycle;
         }
@@ -1041,9 +1020,11 @@ public class ISA {
         @Override
         public byte execute(){
             cpu.statusRegister = cpu.stackPop();
+            cpu.updateFlag(Flag.B, false);
+            cpu.updateFlag(Flag.U, true);
             byte low = cpu.stackPop();
             byte high = cpu.stackPop();
-            cpu.programCounter = ((high << 8) | low ) & 0xFFFF;
+            cpu.programCounter = ((( ( high & 0xFF) << 8 ) | ( low & 0xFF ) ) & 0xFFFF ) + 1;
             printASM("RTI");
             return (byte)cycle;
         }
@@ -1378,12 +1359,11 @@ public class ISA {
     opcodes.put((byte)0x4A, new Opcode((byte)2) {
         @Override
         public byte execute(){
-            int value = cpu.accumulator;
+            int value = cpu.accumulator & 0xFF;
             boolean carry =( value & 1) == 1;
-            value >>= 1;
-            byte result = (byte)( value & 0xff);
-            updateASFlags(result, carry);
-            cpu.accumulator = result;
+            value >>>= 1;
+            cpu.accumulator = (byte)value;
+            updateASFlags(value, carry);
             printASM("LSR Accumulator");
             return (byte)cycle;
         }
@@ -1536,10 +1516,9 @@ public class ISA {
     opcodes.put((byte)0x28, new Opcode((byte)4) {
         @Override
         public byte execute(){
-            cpu.statusRegister = cpu.stackPop(); 
-            cpu.updateFlag(Flag.D, true);
+            cpu.statusRegister = cpu.stackPop();
             cpu.updateFlag(Flag.B, false);
-            updateZNFlags(cpu.statusRegister);
+            cpu.updateFlag(Flag.U, true);
             printASM("PLP");
             return (byte)cycle;
         }
@@ -1600,7 +1579,7 @@ public class ISA {
         @Override
         public byte execute(){
             boolean carry = (cpu.accumulator & 1 ) == 1;
-            int value = ((cpu.accumulator >> 1) | (cpu.getFlag(Flag.C) << 8 ) ) & 0xFF;
+            int value = ((cpu.accumulator & 0xFF) >> 1) | (cpu.getFlag(Flag.C) << 7 );
             cpu.accumulator = (byte)value;
             updateASFlags(cpu.accumulator, carry);
             printASM("ROR Accumulator");

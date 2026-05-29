@@ -42,8 +42,8 @@ public class ROM {
             byte[] header = new byte[16];
             br.read(header);
             int fileType = (header[7] & 12) == 8 ? 2 : 1;
-            nTableArrangeMent = (header[6] & 1 ) == 0  ? NameTableArrangeMent.VERTICAL : NameTableArrangeMent.HORIZONTAL;
-            boolean alternativeNameTables = (header[6] & 8 ) == 1;
+            nTableArrangeMent = (header[6] & 1 ) == 0  ? NameTableArrangeMent.HORIZONTAL : NameTableArrangeMent.VERTICAL;
+            boolean alternativeNameTables = (header[6] & 8 ) != 0;
             if((header[6] & 4) >  0 ){
                 br.skip(256l);
             }
@@ -56,7 +56,7 @@ public class ROM {
             }else{// bytes 8-15 in NES 2 format
                 pgr_rom_size = ((header[9] & 0xF) << 8) |  (header[4] & 0xFF);
                 chr_rom_size = ((header[9] & 0xF0) << 4) |  (header[5]  & 0xFF);
-                mapper = ((header[6] & 0xF) << 8 ) | (header[7] & 0xF0 ) | ((header[6] & 0xF0) >> 4 ) ;
+                mapper = ((header[8] & 0x0F) << 8 ) | (header[7] & 0xF0 ) | ((header[6] & 0xF0) >> 4 ) ;
             }
             System.out.println("iNES File Format : " + fileType + "\n\n");
             pgr_rom_size *= 16 * Constants.ONE_KB;
