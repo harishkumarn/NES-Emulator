@@ -114,7 +114,7 @@ public class PPU {
         if(address >= 0x2000 && address <= 0x3FFF){
             address = (address - 0x2000 ) & 0x7;
         }
-        switch(address ){
+        switch(address){
             case 0:// PPUCTRL
             registers[0] = data;
             break;

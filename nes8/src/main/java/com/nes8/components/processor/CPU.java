@@ -90,7 +90,7 @@ public class CPU{
         Thread.sleep(0,(int)(cycles *  558 / Settings.GAME_SPEED));
         // Batch sleep to avoid Thread.sleep granularity issues ( ~ 1 ms minimum)
         currentCycles += cycles;
-        if(currentCycles >= 3){
+        if(currentCycles >= 100){
             long nanos = (long)(currentCycles *  558 / Settings.GAME_SPEED);
             Thread.sleep(nanos / 1_000_000, (int) (nanos % 1_000_000));
             currentCycles = 0;
@@ -123,7 +123,7 @@ public class CPU{
     public void updateFlag(Flag flag, boolean yes){
         if(yes) {
             this.statusRegister |= flag.index;
-        }else if((this.statusRegister & flag.index) > 0){
+        }else {
             this.statusRegister &= ~flag.index;
         }
     }
@@ -167,7 +167,7 @@ public class CPU{
     public int getAbsolute(){
         byte low = bus.cpuRead(programCounter++);
         byte high = bus.cpuRead(programCounter++);
-        return  ((high << 8 ) | low) & 0xFFFF;
+        return  ((high << 8 ) | (low & 0xFF) ) & 0xFFFF;
     }
 
     public int getAbsoluteX(){
@@ -190,7 +190,7 @@ public class CPU{
        int address =  ((  ( high & 0xFF) << 8) | (low & 0xFF) ) & 0xFFFF;
        low  = bus.cpuRead(address);
        high = bus.cpuRead((address & 0xFF00) | ((address + 1) & 0xFF));
-       address =  ((high << 8) | (low & 0xFF) ) & 0xFFFF;
+       address =  (( ( high & 0xFF ) << 8) | (low & 0xFF) ) & 0xFFFF;
        return address;
     }
 

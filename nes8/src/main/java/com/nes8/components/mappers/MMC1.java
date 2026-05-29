@@ -14,12 +14,10 @@ public class MMC1 implements MemoryMappingController{
     public byte read(int address) {
         if(address >= 0x0000 && address <= 0x1FFF){
             return  rom.pt_data[address];
-        }else if(address >= 0xA000 && address <= 0xFFFF){
-            return rom.pt_data[address]; 
         } else if( address >= 0x6000 && address <= 0x7FFF){
             return rom.sram[address - 0x6000];
-        } else if( address >= 0x8000 && address <= 0x9FFF){
-            return rom.pt_data[address];
+        } else if( address >= 0x8000 && address <= 0xFFFF){
+            return rom.pgr_ROM[(address - 0x8000) % rom.pgr_ROM.length];
         }
         return 0;
     }

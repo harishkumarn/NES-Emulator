@@ -60,7 +60,7 @@ public class Bus{
             // So, every 0x20 Bytes the Palette RAM repeats
             int palAddr = address & 0x1F;
             if(palAddr == 0x10 || palAddr == 0x14 || palAddr == 0x18 || palAddr == 0x1C){
-                palAddr &= 0x10;// These addresses are mirrors of 0x00, 0x04, 0x08, 0x0C
+                palAddr &= 0x0F;// These addresses are mirrors of 0x00, 0x04, 0x08, 0x0C
             }
             return ppu.pallete.readPallete(0x3F00 + palAddr);
         }
