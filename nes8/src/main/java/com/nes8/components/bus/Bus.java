@@ -33,7 +33,7 @@ public class Bus{
         }else if(address == 0x4016 || address == 0x4017){
             res = controller.rightShiftRegister(address);
         }
-        else if(address >= 4020 && address <= 0xFFFF){
+        else if(address >= 0x4020 && address <= 0xFFFF){
             res = rom.mmc.read(address);
         }
         return (byte)(res & 0xFF);
@@ -43,13 +43,26 @@ public class Bus{
         if(address >= 0x0000 && address <= 0x1FFF){
             return rom.mmc.read(address);
         }else if(address >= 0x2000 && address <= 0x3EFF){
-            return ppu.nt.read((address - 0x2000 ) & 0x7FF);// Mirrored every 2KB
+            int a = (address - 0x2000) & 0x0FFF;// Mirrored every 4KB
+            int table = a / 0x400; // Each nametable is 1KB
+            int offset = a & 0x3FF;
+            int physical;
+            if(rom.nTableArrangeMent == ROM.NameTableArrangeMent.HORIZONTAL){
+                physical = (table / 2) * 0x400 + offset;
+            } else {
+                physical = (table % 2 ) * 0x400 + offset;
+            }
+            return ppu.nt.read(physical);
         }else if(address >=0x3F00 && address <= 0x3FFF ){
             // PPU's Palette Memory is about 32 Bytes
             // 0x3F00 to 0x3F1F
             // 0x3F20 to 0x3F3F, 0x3F40 to 0x3F5F....., 0X3FEF TO 3FFF are mirrors
             // So, every 0x20 Bytes the Palette RAM repeats
-            return ppu.pallete.readPallete(address & 0x3F1F);
+            int palAddr = address & 0x1F;
+            if(palAddr == 0x10 || palAddr == 0x14 || palAddr == 0x18 || palAddr == 0x1C){
+                palAddr &= 0x10;// These addresses are mirrors of 0x00, 0x04, 0x08, 0x0C
+            }
+            return ppu.pallete.readPallete(0x3F00 + palAddr);
         }
         return 0;
     }
@@ -75,7 +88,7 @@ public class Bus{
                 controller.loadShiftRegisters();
             }
         }
-        else if(address >= 4020 && address <= 0xFFFF){
+        else if(address >= 0x4020 && address <= 0xFFFF){
             System.out.println("ROM write");
             rom.mmc.write(address, value);
         }   
@@ -84,7 +97,27 @@ public class Bus{
 
     public void ppuWrite(int address, byte value){
         // PPU can write only to its 8 registers
-    }
+        address &= 0x3FFF;
+        if(address >= 0x0000 && address <= 0x1FFF){
+            rom.mmc.write(address, value);
+        } else if(address >= 0x2000 && address <= 0x3EFF){
+            int a = (address - 0x2000) & 0x0FFF;// Mirrored every 4KB
+            int table = a / 0x400; // Each nametable is 1KB
+            int offset = a & 0x3FF;
+            int physical;
+            if(rom.nTableArrangeMent == ROM.NameTableArrangeMent.HORIZONTAL){
+                physical = (table / 2) * 0x400 + offset;
+            } else {
+                physical = (table % 2 ) * 0x400 + offset;
+            }
+            ppu.nt.vram[physical & 0x7FF] = value;
+        }else if(address >=0x3F00 && address <= 0x3FFF ){
+            int palAddr = address & 0x1F;
+            if(palAddr == 0x10 || palAddr == 0x14 || palAddr == 0x18 || palAddr == 0x1C){
+                palAddr &= 0x0F;// These addresses are mirrors of 0x00, 0x04, 0x08, 0x0C
+            }
+            ppu.pallete.updatePalette(0x3F00 + palAddr, value);
+    } 
 
     public void setCPU(CPU cpu){
         this.cpu = cpu;

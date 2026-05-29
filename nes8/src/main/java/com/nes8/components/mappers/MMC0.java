@@ -33,7 +33,9 @@ public class MMC0 implements MemoryMappingController{
     @Override
     public void write(int address, byte value) {
         if(address >= 0x0000 && address <= 0x1FFF){
-            rom.pt_data[address] = value;// write to CRH RAM
+            if(rom.chr_rom_size == 0){
+                rom.pt_data[address] = value;
+            }
         }
         else if(address >=  0x6000 && address <= 0x7FFF){
             rom.sramModified = true;

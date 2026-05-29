@@ -23,7 +23,7 @@ public class ROM {
     public byte[] sram = initSRAM();
     public boolean sramModified = false;
     public MemoryMappingController mmc ;
-    NameTableArrangeMent nTableArrangeMent;
+    public NameTableArrangeMent nTableArrangeMent;
     BufferedInputStream br = null;
     public int pgr_rom_size = 0;
     public int chr_rom_size =0;

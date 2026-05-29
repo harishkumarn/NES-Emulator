@@ -16,6 +16,10 @@ public class MMC1 implements MemoryMappingController{
             return  rom.pt_data[address];
         }else if(address >= 0xA000 && address <= 0xFFFF){
             return rom.pt_data[address]; 
+        } else if( address >= 0x6000 && address <= 0x7FFF){
+            return rom.sram[address - 0x6000];
+        } else if( address >= 0x8000 && address <= 0x9FFF){
+            return rom.pt_data[address];
         }
         return 0;
     }

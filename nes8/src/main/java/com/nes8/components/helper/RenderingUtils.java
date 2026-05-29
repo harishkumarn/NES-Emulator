@@ -24,6 +24,7 @@ public class RenderingUtils {
             for(int l = 7; l >= 0;--l){
                 x = i + k;
                 y = j + ( 7 - l );
+                if(x >= display.length || y >= display[0].length) continue;
                 c = 0 ;
                 if((highByte[k] & ( 1<< l)) > 0 ) c = 2;
                 if((lowByte[k] & ( 1<< l)) > 0) c += 1;
