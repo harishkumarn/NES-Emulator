@@ -1,4 +1,4 @@
-package com.nes8.components.helper;
+package com.nes8.components.helper.controller;
 
 import com.nes8.Settings;
 

@@ -1,4 +1,4 @@
-package com.nes8.components.helper;
+package com.nes8.components.helper.display;
 
 import javax.swing.JPanel;
 import javax.swing.*;
@@ -18,7 +18,8 @@ public class Display extends JPanel{
         setPreferredSize(new Dimension(w * scale, h * scale));
 
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame(name);
+            JFrame frame = JFrameSingleton.getInstance();
+            frame.setTitle(name);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.getContentPane().add(this);
             frame.pack();

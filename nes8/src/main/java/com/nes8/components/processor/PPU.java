@@ -2,13 +2,13 @@ package com.nes8.components.processor;
 
 
 import com.nes8.Settings;
-import com.nes8.components.helper.RenderingUtils;
 import com.nes8.graphics.*;
 
 import java.awt.Color;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.nes8.components.bus.Bus;
+import com.nes8.components.helper.display.RenderingUtils;
 
 /**
  * Memory range : 0x0000 to 0x3FFF

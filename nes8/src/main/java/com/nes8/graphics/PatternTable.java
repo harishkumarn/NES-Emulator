@@ -5,8 +5,8 @@ import com.nes8.components.bus.Bus;
 
 import java.awt.Color;
 
-import com.nes8.components.helper.Display;
-import com.nes8.components.helper.RenderingUtils;
+import com.nes8.components.helper.display.Display;
+import com.nes8.components.helper.display.RenderingUtils;
  
 /**
  * Range : 0X0000 to 0x1FFF

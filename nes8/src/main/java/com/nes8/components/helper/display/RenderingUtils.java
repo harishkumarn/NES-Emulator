@@ -1,4 +1,4 @@
-package com.nes8.components.helper;
+package com.nes8.components.helper.display;
 
 import java.awt.Color;
 import com.nes8.components.bus.Bus;

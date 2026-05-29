@@ -1,8 +1,8 @@
 package com.nes8.graphics;
 
 import com.nes8.Settings;
-import com.nes8.components.helper.Display;
 import com.nes8.components.bus.Bus;
+import com.nes8.components.helper.display.Display;
 
 import java.awt.Color;
 

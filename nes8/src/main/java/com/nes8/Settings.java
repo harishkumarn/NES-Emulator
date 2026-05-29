@@ -1,10 +1,10 @@
 package com.nes8;
 
-import com.nes8.components.helper.ControllerInterface;
+import com.nes8.components.helper.controller.ControllerInterface;
 
 public class Settings {
     public static final String BASE_PATH = "E:\\Git Repos\\NES-Emulator";
-    public static final String ROM_PATH = Settings.BASE_PATH + "\\ROMS\\DonkeyKong.nes";
+    public static final String ROM_PATH = Settings.BASE_PATH + "\\ROMS\\mario.nes";
 
     public static final int PT_SCALE = 2;
     public static final int DISPLAY_SCALE = 2; 

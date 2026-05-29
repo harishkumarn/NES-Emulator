@@ -3,7 +3,7 @@ package com.nes8.graphics;
 import java.awt.Color;
 
 import com.nes8.Settings;
-import com.nes8.components.helper.Display;
+import com.nes8.components.helper.display.Display;
 
 
 /**
