@@ -88,8 +88,8 @@ public class ISA {
     private void LSR(int address){
         int value = cpu.bus.cpuRead(address) & 0xFF;
         boolean carry =( value & 1) == 1;
-        value >>= 1;
-        byte result = (byte)( value & 0xff);
+        value >>>= 1;
+        byte result = (byte)( value);
         updateASFlags(result, carry);
         cpu.bus.cpuWrite(address, (byte)result);
     }
@@ -1024,7 +1024,7 @@ public class ISA {
             cpu.updateFlag(Flag.U, true);
             byte low = cpu.stackPop();
             byte high = cpu.stackPop();
-            cpu.programCounter = ((( ( high & 0xFF) << 8 ) | ( low & 0xFF ) ) & 0xFFFF ) + 1;
+            cpu.programCounter = ((( high & 0xFF) << 8 ) | ( low & 0xFF )) & 0xFFFF;
             printASM("RTI");
             return (byte)cycle;
         }

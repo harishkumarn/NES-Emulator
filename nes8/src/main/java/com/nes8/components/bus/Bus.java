@@ -72,19 +72,15 @@ public class Bus{
             ram.write(address & 0x07FF, value);// Mirrored every 2KB
         }
         else if(address >= 0x2000 && address <= 0x3FFF){
-            System.out.println("PPU registers written 0x" +  Integer.toHexString(address) + " " + value);
             ppu.write(address, value);
         }
         else if((address >= 0x4000 && address <= 0x4013) || address == 0x4015 || address == 0x4017){
-            System.out.println("APU write");
             apu.write(address, value);
         }else if(address == 0x4014){
-            System.out.println("DMA transfer");
             DMA.startDMATransfer(value, ram, ppu);
         }
         else if(address == 0x4016 ){
             if(value == 1){
-                System.out.println("Controller write");
                 controller.loadShiftRegisters();
             }
         }
