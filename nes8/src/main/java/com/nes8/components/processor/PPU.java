@@ -6,6 +6,7 @@ import com.nes8.components.helper.RenderingUtils;
 import com.nes8.graphics.*;
 
 import java.awt.Color;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.nes8.components.bus.Bus;
 
@@ -14,7 +15,8 @@ import com.nes8.components.bus.Bus;
  */
 public class PPU {
     Bus bus;
-    static int[][] tileQuadrantMapping = new int[][]{{0,1,2,3}};
+    static int[][] tileQuadrantMapping = new int[][]{{0,1},{2,3}};
+    
 
     int patternTableAddress;
 
@@ -25,7 +27,12 @@ public class PPU {
     OutputBuffer gui ;
 
     //8 PPU registers memory mapped from 0x2000 to 0x2007
-    public volatile byte[] registers = new byte[8];
+    public byte[] registers = new byte[8];
+    public AtomicInteger ppuStatus  = new AtomicInteger(0);
+
+    private int addressLatch = 0;
+    private int vramAddress = 0;
+    private byte vramBuffer = 0;
 
     public PPU(Bus bus){
         this.bus = bus;
@@ -48,9 +55,11 @@ public class PPU {
 
 
     private void renderGUI() throws InterruptedException{
-        registers[2] |= 0x80;
-        bus.cpu.NMI();
         while(true){
+            // 261 - Pre-Render Scanline
+            ppuStatus.set(ppuStatus.get() & ~0x80);
+            hBlank(); 
+
             // Each iteration renders a frame
             int vramOffset = getVRAMOffset();
             int ptOffset = getPTOffsetForBackground();
@@ -63,61 +72,81 @@ public class PPU {
                 //      256 - 320 Sprite fetch for next line
                 //      321 - 340 Fetches tile data for next line
                 for(int j = 0 ; j < 256; j += 8 ){
-                    byte tileIndex = bus.ppuRead(vramOffset ++);
-                    RenderingUtils.renderTile(i, j, ptOffset + tileIndex * 16, gui.outputBuffer,getPalleteForBackground(i,j, vramOffset) , bus);
+                    int tileIndex = bus.ppuRead(vramOffset ++) & 0xFF;
+                    RenderingUtils.renderTile(i, j, ptOffset + tileIndex * 16, gui.outputBuffer, getPalleteForBackground(i,j, vramOffset) , bus);
                 }
                 //H-BLANK
             }
             // 240 - Post-Render   
-            cycle(341);
+            hBlank();
 
-            // 241 - 260
-            //V-BLANK
-            registers[2] |= 0x80; // Set bit 7
-            bus.cpu.NMI();
-            vBlank();
-
-            // 261 - Pre-Blank
-            registers[2] &= ~0x80; // Clear Bit 7
-            cycle( 341 );
             this.gui.rerender();
+
+            // 241 - 260 V-BLANK
+            ppuStatus.set(ppuStatus.get() | 0x80);
+            if((registers[0] & 0x80) != 0){
+                bus.cpu.NMI();
+            } 
+            vBlank();
         }
     }
 
     public byte read(int registerIndex){
-        /*if(registerIndex == 2){
-            Got no clue why the hell I wrote this line
-            if(registers[2] < 0) registers[2]  ^= 0x80;
-        }*/
-
-        return registers[registerIndex];
+        switch(registerIndex){
+            case 2:
+                int val = ppuStatus.getAndUpdate(v -> v & 0x7F);
+                addressLatch = 0;
+                return (byte)val;
+            case 7:
+                byte data  = vramBuffer;
+                vramBuffer = bus.ppuRead(vramAddress);
+                if(vramAddress >= 0x3F00){
+                    data = vramBuffer;
+                }
+                vramAddress += (registers[0] & 4) != 0 ? 32 : 1;
+                return data;
+            default:
+                return registers[registerIndex];
+        }
     }
 
     public void write(int address, byte data){
         if(address >= 0x2000 && address <= 0x3FFF){
             address = (address - 0x2000 ) & 0x7;
         }
-        registers[address ] = data;
         switch(address ){
             case 0:// PPUCTRL
+            registers[0] = data;
             break;
             case 1:// PPUMASK
+            registers[1] = data;
             break;
-            case 2:// PPUSTATUS
-            if((data & 0x80 ) == 0x80) bus.cpu.NMI();
+            case 2:// PPUSTATUS - read only, writes are ignored
             break;
             case 3:// OAMADDR
+            registers[3] = data;
             break;
             case 4:// OAMDATA
+            registers[4] = data;
             oam.write(registers[3], data); 
             break;
             case 5:// PPUSCROLL
+            registers[5] = data;
+            addressLatch ^= 1;
             break;
             case 6:// PPUADDR
+            if( addressLatch == 0){
+                vramAddress = ( (data & 0x3F) << 8) | (vramAddress & 0x00FF);
+            } else {
+                vramAddress = (vramAddress & 0xFF00) | (data & 0xFF);
+            }
+            addressLatch ^= 1;
+            registers[6] = data;
             break;
             case 7:// PPUDATA
-            System.out.println("Nametable init");
-            nt.write(registers[6], data);
+            bus.ppuWrite(vramAddress, data);
+            vramAddress += (registers[0] & 4) != 0 ? 32 : 1;
+            registers[7] = data;
             break;
         }
     }
@@ -132,7 +161,7 @@ public class PPU {
     }
 
     public int getVRAMOffset(){
-        switch((registers[2] & 3)){
+        switch((registers[0] & 3)){
             case 0:
             return 0x2000;
             case 1:
@@ -146,30 +175,28 @@ public class PPU {
     }
 
     public Color[] getPalleteForBackground(int i, int j, int vramOffset){
-        int attributeTableOffset = vramOffset + 960;
-        byte data = bus.ppuRead(attributeTableOffset + i * 8 + j * 8);
-        int pIndex = 0;
-        switch(tileQuadrantMapping[(i % 4 ) / 2][(j % 4 ) /2]){
-            case 0:
-            pIndex = (data >> 6) & 3;
-            break;
-            case 1:
-            pIndex = (data >> 4) & 3;
-            break;
-            case 2:
-            pIndex = (data >> 2) & 3;
-            break;
-            default:
-            pIndex = data & 3;
-        }
+        int baseNT = getVRAMOffset();
+        int attributeTableOffset = baseNT + 960 ;
+        int tileX = j / 8;
+        int tileY = i / 8;
+        int attrIndex = ( tileY / 4 ) * 8 + ( tileX / 4 );
+        byte data = bus.ppuRead(attributeTableOffset + attrIndex);
+        int shift = ((tileY & 2) << 1 ) | ( tileX & 2);
+        int pIndex = (data >> shift) & 0x3;
         Color[] c = new Color[4];
-        for(int k = 0 ; k < 4;++k) c[i] = Pallete.pallete[pallete.backGround[pIndex][k]];
+        c[0] = Pallete.pallete[pallete.backGround[0][0] & 0x3F];
+        for(int k = 1 ; k < 4; k++){
+            c[k] = Pallete.pallete[pallete.backGround[pIndex][k] & 0x3F];
+        }
         return c;
     }
 
     private void cycle(int cycles) throws InterruptedException{
         // 5.32 MHz is roughly  188 nano sec per cycle
-        Thread.sleep(0,(int)(cycles *  188  / Settings.GAME_SPEED));
+        long nanos = (long)(cycles * 188 / Settings.GAME_SPEED);
+        long millis = nanos / 1_000_000; 
+        int remainNanos = (int)(nanos % 1_000_000);
+        Thread.sleep(millis, remainNanos);
     }
 
     private void hBlank() throws InterruptedException{
