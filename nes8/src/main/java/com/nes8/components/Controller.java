@@ -2,15 +2,16 @@ package com.nes8.components;
 
 import com.nes8.components.bus.Bus;
 import com.nes8.components.helper.controller.ControllerInterface;
+import com.nes8.Settings;
 
 public class Controller {
     Bus bus;
     public byte shiftregister1 = 0 , shiftregister2 = 0 ;
     byte shiftIndex1 = 0 , shiftIndex2 = 0 ;
-    ControllerInterface controllers = new ControllerInterface();
+    ControllerInterface controllers = new ControllerInterface(Settings.CONTROLLER_TYPE);
 
     private Controller(Bus bus){
-        this.bus = bus;
+        this.bus = bus; 
         bus.setController(this);
     }
 

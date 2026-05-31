@@ -1,5 +1,5 @@
 package com.nes8.components.helper.controller;
 
-public class KeyBoardController implements Controls {
+public interface Controls {
     
 }

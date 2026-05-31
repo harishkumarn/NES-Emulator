@@ -77,6 +77,20 @@ public class PPU {
                 }
                 //H-BLANK
             }
+            ptOffset = getPTOffsetForForeground();
+            for(int i = 0 ; i < 256; i += 4){
+                int spriteY = oam.oam[i ] & 0xFF;
+                if(spriteY >= 240) continue;
+                int tileIndex = oam.oam[i + 1] & 0xFF;
+                int attributes = oam.oam[i + 2] & 0xFF;
+                int spriteX = oam.oam[i + 3] & 0xFF;
+                int spritePalletteIndex = attributes & 0x3;
+                boolean horizontalFlip = (attributes & 0x40) != 0;
+                boolean verticalFlip = (attributes & 0x80) != 0;
+                int priority = (attributes & 0x20) != 0 ? 1 : 0;
+                Color[] spritePallette = getPalleteForForeground(spritePalletteIndex);
+                RenderingUtils.renderSprite(spriteY, spriteX,ptOffset + tileIndex * 16, priority, horizontalFlip, verticalFlip, gui.outputBuffer, spritePallette, bus);
+            }
             // 240 - Post-Render   
             hBlank();
 
@@ -187,6 +201,15 @@ public class PPU {
         c[0] = Pallete.pallete[pallete.backGround[0][0] & 0x3F];
         for(int k = 1 ; k < 4; k++){
             c[k] = Pallete.pallete[pallete.backGround[pIndex][k] & 0x3F];
+        }
+        return c;
+    }
+
+    public Color[] getPalleteForForeground(int spriteIndex ){
+        Color[] c = new Color[4];
+        c[0] = Pallete.pallete[pallete.foreGround[spriteIndex][0] & 0x3F];
+        for(int k = 1 ; k < 4; k++){
+            c[k] = Pallete.pallete[pallete.foreGround[spriteIndex][k] & 0x3F];
         }
         return c;
     }
